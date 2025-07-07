@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
@@ -23,38 +25,25 @@ import androidx.navigation.compose.composable
 import com.example.gulcinmobile.ui.components.NewsCard
 import com.example.gulcinmobile.ui.components.SettingsDialog
 import com.example.gulcinmobile.datastore.DataStoreManager
-import kotlinx.coroutines.launch
+import com.example.gulcinmobile.ui.components.strings
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.runBlocking
 import androidx.navigation.NavController
+import androidx.lifecycle.ViewModelProvider
+import com.example.gulcinmobile.viewmodel.NewsViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-        val dataStoreManager = DataStoreManager(applicationContext)
-        var languageLoaded = false
-        var languageCode = "tr"
-
-
-        runBlocking {
-            languageCode = dataStoreManager.getLanguage()
-            languageLoaded = true
-        }
-
         setContent {
             GulcinMobileTheme {
                 val navController = rememberNavController()
-
-                if (languageLoaded) {
-                    NavHost(navController = navController, startDestination = "welcome") {
-                        composable("welcome") { WelcomeScreen(navController) }
-                        composable("main") {
-                            SearchScreen(languageCode = languageCode, navController = navController)
-                        }
-
+                NavHost(navController = navController, startDestination = "welcome") {
+                    composable("welcome") { WelcomeScreen(navController) }
+                    composable("main") {
+                        SearchScreen(navController = navController)
                     }
                 }
             }
@@ -65,72 +54,78 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    languageCode: String,
-    navController: NavController,
-    viewModel: NewsViewModel = viewModel()
+    navController: NavController
 ) {
+    val context = LocalContext.current
+    val viewModel: NewsViewModel = viewModel(
+        factory = NewsViewModelFactory(context)
+    )
     val uiState by viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
-    // Dil seçimi viewModel'a geçiliyor
-    LaunchedEffect(languageCode) {
-        viewModel.selectedLanguageCode = languageCode
-    }
-    val context = LocalContext.current
-    val dataStoreManager = remember { DataStoreManager(context) }
+    // Track language changes
+    var currentLanguage by remember { mutableStateOf(viewModel.selectedLanguageCode) }
+
+    // Get localized strings based on selected language
+    val localStrings = strings[currentLanguage] ?: strings["en"] ?: mapOf()
 
     var showDialog by remember { mutableStateOf(false) }
 
-
     Scaffold(Modifier.fillMaxSize(), {
         TopAppBar(
-            title = { Text("AI News") },
+            title = { Text(localStrings["app_title"] ?: "AI News") },
             actions = {
                 IconButton(onClick = {
                     showDialog = true
                 }) {
-                    Icon(Icons.Default.Settings, contentDescription = "Ayarlar")
+                    Icon(Icons.Default.Settings, contentDescription = localStrings["settings"] ?: "Settings")
                 }
-
             }
         )
-    }
-
-    ) { paddingValues ->
+    }) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
                 .background(Color(0xFFFFF8E1))
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
         ) {
-
-            Button(onClick = { viewModel.getTechNews() }) {
-                Text("Yapay Zekâ ve Teknoloji Gelişmelerini Göster 💡")
+            Button(
+                onClick = { viewModel.getTechNews() },
+                modifier = Modifier.padding(vertical = 16.dp)
+            ) {
+                Text(localStrings["show_news"] ?: "Show AI and Technology News 💡")
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             if (uiState.error.isNotEmpty()) {
-                Text("Hata: ${uiState.error}", color = MaterialTheme.colorScheme.error)
+                Text(
+                    "${localStrings["error"] ?: "Error"}: ${uiState.error}",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
             } else {
-                uiState.articles.take(5).forEach { article ->
-                    NewsCard(article = article)
+                // LazyColumn ile kaydırma özelliği ekliyoruz
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Tüm haberleri gösteriyoruz, take(5) kısıtlamasını kaldırdık
+                    items(uiState.articles) { article ->
+                        NewsCard(article = article)
+                    }
                 }
-
             }
-
         }
+
         if (showDialog) {
             SettingsDialog(
-                currentLanguage = languageCode,
+                currentLanguage = currentLanguage,
                 onDismiss = { showDialog = false },
                 onSave = { newLang ->
                     coroutineScope.launch {
-                        dataStoreManager.saveLanguage(newLang)
+                        viewModel.updateLanguage(newLang)
+                        currentLanguage = newLang // Apply language change immediately
                         showDialog = false
-                        navController.popBackStack()
-                        navController.navigate("main")
                     }
                 }
             )

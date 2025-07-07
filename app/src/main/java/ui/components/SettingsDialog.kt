@@ -26,19 +26,22 @@ fun SettingsDialog(
 
     var selectedLang by remember { mutableStateOf(currentLanguage) }
 
+    // Dile göre metinleri al
+    val localStrings = strings[currentLanguage] ?: strings["en"] ?: mapOf()
+
     AlertDialog(
         onDismissRequest = { onDismiss() },
         confirmButton = {
             TextButton(onClick = { onSave(selectedLang) }) {
-                Text("Kaydet")
+                Text(localStrings["save"] ?: "Save")
             }
         },
         dismissButton = {
             TextButton(onClick = { onDismiss() }) {
-                Text("Vazgeç")
+                Text(localStrings["cancel"] ?: "Cancel")
             }
         },
-        title = { Text("Dil Seçimi") },
+        title = { Text(localStrings["language_selection"] ?: "Select Language") },
         text = {
             Column {
                 languages.forEach { (code, name) ->

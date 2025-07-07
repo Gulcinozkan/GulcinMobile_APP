@@ -7,10 +7,12 @@ import retrofit2.Call
 
 interface MicrosoftTranslateService {
     @Headers("Content-Type: application/json")
-    @POST("translate?api-version=3.0")
+    @POST("translate")
     fun translateDynamic(
-        @Header("Ocp-Apim-Subscription-Key") key: String = "EtTISMBaiR6jFC2tM2YiozgsJCV6526WNxDRHxjhgcWmTAX8jqxJJQQJ99BGACqBBLyXJ3w3AAAbACOG56Zw",
+        @Header("Ocp-Apim-Subscription-Key") key: String,
+        @Query("api-version") apiVersion: String = "3.0",
         @Query("to") toLang: String,
+        @Query("from") fromLang: String = "en", // Her zaman İngilizce'den çeviri yapıyoruz
         @Body body: List<TranslationRequest>
     ): Call<List<TranslationResponseItem>>
 }

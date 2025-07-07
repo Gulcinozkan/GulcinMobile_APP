@@ -14,6 +14,7 @@ class NewsRepository {
 
     suspend fun searchTechNews(apiKey: String): GNewsResponse {
         val query = "artificial intelligence OR robotics OR technology invention"
+        // Always fetch news in English
         return apiService.searchNews(query, "en", apiKey)
     }
 }
