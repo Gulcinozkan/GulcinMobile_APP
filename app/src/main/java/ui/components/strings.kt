@@ -2,6 +2,7 @@ package com.example.gulcinmobile.ui.components
 
 val strings = mapOf(
     "en" to mapOf(
+        "home" to "Home",
         "show_news" to "Show AI and Technology News 💡",
         "error" to "Error",
         "save" to "Save",
@@ -31,6 +32,7 @@ val strings = mapOf(
         "continue" to "Continue to News App"
     ),
     "tr" to mapOf(
+        "home" to "Ana Menü",
         "show_news" to "Yapay Zekâ ve Teknoloji Gelişmelerini Göster 💡",
         "error" to "Hata",
         "save" to "Kaydet",
@@ -60,6 +62,7 @@ val strings = mapOf(
         "continue" to "Haber Uygulamasına Devam Et"
     ),
     "fr" to mapOf(
+        "home" to "Accueil",
         "show_news" to "Afficher les actualités IA et technologie 💡",
         "error" to "Erreur",
         "save" to "Enregistrer",
@@ -89,6 +92,7 @@ val strings = mapOf(
         "continue" to "Continuer vers l'application d'actualités"
     ),
     "es" to mapOf(
+        "home" to "Inicio",
         "show_news" to "Mostrar noticias de IA y tecnología 💡",
         "error" to "Error",
         "save" to "Guardar",
@@ -118,6 +122,7 @@ val strings = mapOf(
         "continue" to "Continuar a la aplicación de noticias"
     ),
     "de" to mapOf(
+        "home" to "Startseite",
         "show_news" to "KI- und Technologie-Nachrichten anzeigen 💡",
         "error" to "Fehler",
         "save" to "Speichern",

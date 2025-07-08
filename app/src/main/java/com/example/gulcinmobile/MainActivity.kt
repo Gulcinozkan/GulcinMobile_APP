@@ -4,49 +4,55 @@ package com.example.gulcinmobile
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.Newspaper
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.gulcinmobile.ui.theme.GulcinMobileTheme
-import com.example.gulcinmobile.viewmodel.NewsViewModel
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.launch
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.example.gulcinmobile.ui.components.NewsCard
 import com.example.gulcinmobile.ui.components.SettingsDialog
-import com.example.gulcinmobile.datastore.DataStoreManager
 import com.example.gulcinmobile.ui.components.strings
-import androidx.compose.ui.platform.LocalContext
-import kotlinx.coroutines.runBlocking
-import androidx.navigation.NavController
-import androidx.lifecycle.ViewModelProvider
+import com.example.gulcinmobile.ui.theme.GulcinMobileTheme
+import com.example.gulcinmobile.viewmodel.NewsViewModel
 import com.example.gulcinmobile.viewmodel.NewsViewModelFactory
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.Newspaper
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.SportsSoccer
-import androidx.compose.material.icons.filled.Star
+import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 
 class MainActivity : ComponentActivity() {
@@ -117,11 +123,17 @@ fun MainScreen(
     val localStrings = strings[currentLanguage] ?: strings["en"] ?: mapOf()
 
     var showDialog by remember { mutableStateOf(false) }
-    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     // Drawer menü öğeleri
     val drawerItems = listOf(
+        DrawerItem(
+            title = localStrings["home"] ?: "Ana Menü",
+            route = "main",
+            icon = Icons.Default.Home,
+            contentDescription = "Ana Menü"
+        ),
         DrawerItem(
             title = localStrings["general_news"] ?: "General News",
             route = "general_news",
@@ -180,20 +192,27 @@ fun MainScreen(
                 Divider()
                 Spacer(modifier = Modifier.height(8.dp))
 
+
                 // Menü öğeleri
+                val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
                 drawerItems.forEach { item ->
-                    NavigationDrawerItem(
-                        icon = { Icon(item.icon, contentDescription = item.contentDescription) },
-                        label = { Text(item.title) },
-                        selected = false,
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
-                                navController.navigate(item.route)
-                            }
-                        },
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                    )
+                    // Ana menü her zaman görünsün, diğer sayfalar için normal kontrol yapsın
+                    val shouldShow = item.route == "main" || item.route != currentRoute
+
+                    if (shouldShow) {
+                        NavigationDrawerItem(
+                            icon = { Icon(item.icon, contentDescription = item.contentDescription) },
+                            label = { Text(item.title) },
+                            selected = currentRoute == item.route,
+                            onClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                    navController.navigate(item.route)
+                                }
+                            },
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
+                    }
                 }
             }
         }
@@ -225,46 +244,60 @@ fun MainScreen(
                 )
             }
         ) { paddingValues ->
+
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
                     .background(Color(0xFFFFF8E1))
                     .padding(horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = localStrings["welcome_message"] ?: "Welcome to AI News App!",
-                    style = MaterialTheme.typography.headlineMedium,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                Text(
-                    text = localStrings["select_category"] ?: "Please select a news category from the menu",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(bottom = 32.dp)
-                )
-
-                // Hızlı erişim butonları
-                Button(
-                    onClick = { navController.navigate("tech_news") },
+                // Yazılar (üst kısımda)
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                        .padding(top = 32.dp, bottom = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(localStrings["tech_news"] ?: "Technology News")
+                    Text(
+                        text = "GulcinMobile'a Hoş Geldiniz",
+                        style = MaterialTheme.typography.displayMedium.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 0.5.sp,
+                            fontSize = 54.sp
+                        ),
+                        color = Color(0xFF8BC34A), // Açık yeşil
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(bottom = 64.dp)
+                    )
+
+                    Text(
+                        text = "Haberler ile ilgili son gelişmeleri görmek için menüye tıklayınız.",
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontSize = 24.sp
+                        ),
+                        color = Color(0xFF33691E), // Koyu yeşil
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 32.dp)
+                    )
                 }
 
-                Button(
-                    onClick = { navController.navigate("general_news") },
+                Spacer(modifier = Modifier.weight(1f))
+
+                // Görsel (alt kısımda)
+                Image(
+                    painter = painterResource(id = R.drawable.main_menu),
+                    contentDescription = "Gulcin Mobile Logo",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                ) {
-                    Text(localStrings["general_news"] ?: "General News")
-                }
+                        .height(700.dp)
+                        .padding(bottom = 32.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                )
             }
+
 
             if (showDialog) {
                 SettingsDialog(
@@ -303,7 +336,7 @@ fun NewsScreen(
     val localStrings = strings[currentLanguage] ?: strings["en"] ?: mapOf()
 
     var showDialog by remember { mutableStateOf(false) }
-    var drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     // Kategori başlığını belirle
@@ -404,19 +437,25 @@ fun NewsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Menü öğeleri
+                val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
                 drawerItems.forEach { item ->
-                    NavigationDrawerItem(
-                        icon = { Icon(item.icon, contentDescription = item.contentDescription) },
-                        label = { Text(item.title) },
-                        selected = item.route == "${category}_news",
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
-                                navController.navigate(item.route)
-                            }
-                        },
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                    )
+                    // Ana menü her zaman görünsün, diğer sayfalar için normal kontrol yapsın
+                    val shouldShow = item.route == "main" || item.route != currentRoute
+                    
+                    if (shouldShow) {
+                        NavigationDrawerItem(
+                            icon = { Icon(item.icon, contentDescription = item.contentDescription) },
+                            label = { Text(item.title) },
+                            selected = currentRoute == item.route,
+                            onClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                    navController.navigate(item.route)
+                                }
+                            },
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
+                    }
                 }
             }
         }
