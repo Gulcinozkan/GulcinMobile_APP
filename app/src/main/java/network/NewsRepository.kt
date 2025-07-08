@@ -3,6 +3,8 @@ package com.example.gulcinmobile.network
 import com.example.gulcinmobile.model.GNewsResponse
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import android.util.Log
+import network.RssService
 
 class NewsRepository {
     private val retrofit = Retrofit.Builder()
@@ -11,11 +13,19 @@ class NewsRepository {
         .build()
 
     private val apiService = retrofit.create(GNewsApiService::class.java)
+    private val rssService = RssService()
 
     suspend fun searchTechNews(apiKey: String): GNewsResponse {
-        val query = "artificial intelligence OR robotics OR technology invention"
-        // Always fetch news in English
-        return apiService.searchNews(query, "en", apiKey)
+        // TechCrunch, The Verge ve Wired'dan teknoloji haberleri çekelim
+        Log.d("NewsRepository", "Teknoloji haberleri çekiliyor")
+        try {
+            val response = rssService.fetchTechNews()
+            Log.d("NewsRepository", "Teknoloji haberleri başarıyla çekildi: ${response.articles.size} makale")
+            return response
+        } catch (e: Exception) {
+            Log.e("NewsRepository", "Teknoloji haberleri çekilirken hata oluştu: ${e.message}", e)
+            return GNewsResponse(totalArticles = 0, articles = emptyList())
+        }
     }
 
     suspend fun searchGeneralNews(apiKey: String): GNewsResponse {
