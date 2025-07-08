@@ -17,4 +17,34 @@ class NewsRepository {
         // Always fetch news in English
         return apiService.searchNews(query, "en", apiKey)
     }
+
+    suspend fun searchGeneralNews(apiKey: String): GNewsResponse {
+        val query = "world news OR breaking news"
+        return apiService.searchNews(query, "en", apiKey)
+    }
+
+    suspend fun searchPoliticalNews(apiKey: String): GNewsResponse {
+        val query = "politics OR government OR election"
+        return apiService.searchNews(query, "en", apiKey)
+    }
+
+    suspend fun searchSportsNews(apiKey: String): GNewsResponse {
+        val query = "sports OR football OR basketball OR tennis OR olympics"
+        return apiService.searchNews(query, "en", apiKey)
+    }
+
+    suspend fun searchBusinessNews(apiKey: String): GNewsResponse {
+        val query = "business OR economy OR finance OR stock market"
+        return apiService.searchNews(query, "en", apiKey)
+    }
+
+    suspend fun searchArtNews(apiKey: String): GNewsResponse {
+        val query = "art OR exhibition OR museum OR painting OR sculpture"
+        return apiService.searchNews(query, "en", apiKey)
+    }
+
+    suspend fun searchEntertainmentNews(apiKey: String): GNewsResponse {
+        val query = "celebrity OR entertainment OR movie OR music OR fashion"
+        return apiService.searchNews(query, "en", apiKey)
+    }
 }

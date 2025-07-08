@@ -41,6 +41,9 @@ class NewsViewModel(private val context: Context) : ViewModel() {
 
     var selectedLanguageCode = "en" // Default to English
 
+    // Aktif kategori
+    private var currentCategory = "tech" // Default kategori
+
     // Retrofit client for translation with detailed logging
     private val translateService: MicrosoftTranslateService by lazy {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
@@ -69,17 +72,60 @@ class NewsViewModel(private val context: Context) : ViewModel() {
         }
     }
 
+    // Teknoloji haberleri
     fun getTechNews() {
+        currentCategory = "tech"
+        fetchNews { repository.searchTechNews(apiKey) }
+    }
+
+    // Genel haberler
+    fun getGeneralNews() {
+        currentCategory = "general"
+        fetchNews { repository.searchGeneralNews(apiKey) }
+    }
+
+    // Siyasi haberler
+    fun getPoliticalNews() {
+        currentCategory = "political"
+        fetchNews { repository.searchPoliticalNews(apiKey) }
+    }
+
+    // Spor haberleri
+    fun getSportsNews() {
+        currentCategory = "sports"
+        fetchNews { repository.searchSportsNews(apiKey) }
+    }
+
+    // İş dünyası haberleri
+    fun getBusinessNews() {
+        currentCategory = "business"
+        fetchNews { repository.searchBusinessNews(apiKey) }
+    }
+
+    // Sanat haberleri
+    fun getArtNews() {
+        currentCategory = "art"
+        fetchNews { repository.searchArtNews(apiKey) }
+    }
+
+    // Magazin haberleri
+    fun getEntertainmentNews() {
+        currentCategory = "entertainment"
+        fetchNews { repository.searchEntertainmentNews(apiKey) }
+    }
+
+    // Ortak haber çekme fonksiyonu
+    private fun fetchNews(newsSource: suspend () -> com.example.gulcinmobile.model.GNewsResponse) {
         viewModelScope.launch {
             try {
-                Log.d("NewsViewModel", "Loading news...")
-                _uiState.value = NewsUiState(error = "") // Clear error message
+                Log.d("NewsViewModel", "Loading news for category: $currentCategory")
+                _uiState.value = NewsUiState(error = "", isLoading = true) // Clear error message and show loading
 
-                val response = repository.searchTechNews(apiKey)
+                val response = newsSource()
                 Log.d("NewsViewModel", "API response received: ${response.totalArticles} news found")
 
                 if (response.articles.isEmpty()) {
-                    _uiState.value = NewsUiState(error = "No news found")
+                    _uiState.value = NewsUiState(error = "No news found", isLoading = false)
                     return@launch
                 }
 
@@ -88,7 +134,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
 
                 // Eğer dil İngilizce ise doğrudan göster
                 if (selectedLanguageCode == "en") {
-                    _uiState.value = NewsUiState(articles = originalArticles)
+                    _uiState.value = NewsUiState(articles = originalArticles, isLoading = false)
                     Log.d("NewsViewModel", "Showing original English news")
                 } else {
                     // Değilse çevir
@@ -105,7 +151,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
                     "de" -> "Daten konnten nicht abgerufen werden"
                     else -> "Could not retrieve data"
                 }
-                _uiState.value = NewsUiState(error = "$errorPrefix: ${e.localizedMessage ?: e.toString()}")
+                _uiState.value = NewsUiState(error = "$errorPrefix: ${e.localizedMessage ?: e.toString()}", isLoading = false)
             }
         }
     }
@@ -115,7 +161,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
 
         // Eğer dil İngilizceyse, çeviriye gerek yok
         if (selectedLanguageCode == "en") {
-            _uiState.value = NewsUiState(articles = articles)
+            _uiState.value = NewsUiState(articles = articles, isLoading = false)
             Log.d("NewsViewModel", "Language is English, no translation needed")
             return
         }
@@ -146,7 +192,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
                 if (pendingTranslations.decrementAndGet() == 0) {
                     // Tüm çeviriler tamamlandı, UI'ı güncelle
                     Log.d("NewsViewModel", "All translations complete, updating UI")
-                    _uiState.value = NewsUiState(articles = translatedArticles)
+                    _uiState.value = NewsUiState(articles = translatedArticles, isLoading = false)
                 }
             }
 
@@ -171,7 +217,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
                 if (pendingTranslations.decrementAndGet() == 0) {
                     // Tüm çeviriler tamamlandı, UI'ı güncelle
                     Log.d("NewsViewModel", "All translations complete, updating UI")
-                    _uiState.value = NewsUiState(articles = translatedArticles)
+                    _uiState.value = NewsUiState(articles = translatedArticles, isLoading = false)
                 }
             }
         }
@@ -260,7 +306,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
 
             // Eğer dil İngilizceyse, orijinal haberleri göster
             if (languageCode == "en") {
-                _uiState.value = NewsUiState(articles = originalArticles)
+                _uiState.value = NewsUiState(articles = originalArticles, isLoading = false)
                 Log.d("NewsViewModel", "Showing original English news after language change")
             } else {
                 // Değilse, mevcut haberleri yeni dile çevir
