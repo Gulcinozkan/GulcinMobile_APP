@@ -20,8 +20,10 @@ import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Newspaper
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SmartToy
 import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -129,6 +131,8 @@ fun MainScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+
+
     // Drawer menü öğeleri
     val drawerItems = listOf(
         DrawerItem(
@@ -140,50 +144,50 @@ fun MainScreen(
         DrawerItem(
             title = localStrings["general_news"] ?: "General News",
             route = "general_news",
-            icon = Icons.Outlined.Newspaper,
+            icon = Icons.Default.Newspaper,
             contentDescription = "General News"
         ),
         DrawerItem(
             title = localStrings["tech_news"] ?: "Technology News",
             route = "tech_news",
-            icon = Icons.Outlined.Computer,
+            icon = Icons.Default.Computer,
             contentDescription = "Technology News"
+        ),
+        DrawerItem(
+            title = localStrings["ai_news"] ?: "AI News",
+            route = "ai_news",
+            icon = Icons.Default.SmartToy,
+            contentDescription = "AI News"
         ),
         DrawerItem(
             title = localStrings["political_news"] ?: "Political News",
             route = "political_news",
-            icon = Icons.Outlined.AccountBalance,
+            icon = Icons.Default.AccountBalance,
             contentDescription = "Political News"
         ),
         DrawerItem(
             title = localStrings["sports_news"] ?: "Sports News",
             route = "sports_news",
-            icon = Icons.Outlined.SportsSoccer,
+            icon = Icons.Default.SportsSoccer,
             contentDescription = "Sports News"
         ),
         DrawerItem(
             title = localStrings["business_news"] ?: "Business News",
             route = "business_news",
-            icon = Icons.Outlined.Business,
+            icon = Icons.Default.Business,
             contentDescription = "Business News"
         ),
         DrawerItem(
             title = localStrings["art_news"] ?: "Art News",
             route = "art_news",
-            icon = Icons.Outlined.Palette,
+            icon = Icons.Default.Palette,
             contentDescription = "Art News"
         ),
         DrawerItem(
             title = localStrings["entertainment_news"] ?: "Entertainment News",
             route = "entertainment_news",
-            icon = Icons.Outlined.Movie,
+            icon = Icons.Default.Movie,
             contentDescription = "Entertainment News"
-        ),
-        DrawerItem(
-            title = localStrings["ai_news"] ?: "AI News",
-            route = "ai_news",
-            icon = Icons.Outlined.Computer,
-            contentDescription = "AI News"
         )
     )
 
@@ -205,27 +209,26 @@ fun MainScreen(
                 // Menü öğeleri
                 val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
                 drawerItems.forEach { item ->
-                    // Ana menü her zaman görünsün, diğer sayfalar için normal kontrol yapsın
-                    val shouldShow = item.route == "main" || item.route != currentRoute
-
-                    if (shouldShow) {
-                        NavigationDrawerItem(
-                            icon = { Icon(item.icon, contentDescription = item.contentDescription) },
-                            label = { Text(item.title) },
-                            selected = currentRoute == item.route,
-                            onClick = {
-                                scope.launch {
-                                    drawerState.close()
-                                    navController.navigate(item.route)
-                                }
-                            },
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                        )
-                    }
+                    // Tüm menü öğelerini her zaman göster
+                    NavigationDrawerItem(
+                        icon = { Icon(item.icon, contentDescription = item.contentDescription) },
+                        label = { Text(item.title) },
+                        selected = currentRoute == item.route,
+                        onClick = {
+                            scope.launch {
+                                drawerState.close()
+                                navController.navigate(item.route)
+                            }
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                    )
                 }
             }
         }
-    ) {
+
+
+
+    ){
         // Ana ekran içeriği
         Scaffold(
             topBar = {
@@ -377,6 +380,12 @@ fun NewsScreen(
     // Drawer menü öğeleri
     val drawerItems = listOf(
         DrawerItem(
+            title = localStrings["home"] ?: "Ana Menü",
+            route = "main",
+            icon = Icons.Default.Home,
+            contentDescription = "Ana Menü"
+        ),
+        DrawerItem(
             title = localStrings["general_news"] ?: "General News",
             route = "general_news",
             icon = Icons.Default.Newspaper,
@@ -387,6 +396,12 @@ fun NewsScreen(
             route = "tech_news",
             icon = Icons.Default.Computer,
             contentDescription = "Technology News"
+        ),
+        DrawerItem(
+            title = localStrings["ai_news"] ?: "AI News",
+            route = "ai_news",
+            icon = Icons.Default.SmartToy,
+            contentDescription = "AI News"
         ),
         DrawerItem(
             title = localStrings["political_news"] ?: "Political News",
@@ -419,7 +434,6 @@ fun NewsScreen(
             contentDescription = "Entertainment News"
         )
     )
-
     // Sayfaya girdiğimizde ilgili kategorinin haberlerini yükleme
     LaunchedEffect(category) {
         when (category) {
@@ -451,27 +465,23 @@ fun NewsScreen(
                 // Menü öğeleri
                 val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
                 drawerItems.forEach { item ->
-                    // Ana menü her zaman görünsün, diğer sayfalar için normal kontrol yapsın
-                    val shouldShow = item.route == "main" || item.route != currentRoute
-                    
-                    if (shouldShow) {
-                        NavigationDrawerItem(
-                            icon = { Icon(item.icon, contentDescription = item.contentDescription) },
-                            label = { Text(item.title) },
-                            selected = currentRoute == item.route,
-                            onClick = {
-                                scope.launch {
-                                    drawerState.close()
-                                    navController.navigate(item.route)
-                                }
-                            },
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                        )
-                    }
+                    // Tüm menü öğelerini her zaman göster
+                    NavigationDrawerItem(
+                        icon = { Icon(item.icon, contentDescription = item.contentDescription) },
+                        label = { Text(item.title) },
+                        selected = currentRoute == item.route,
+                        onClick = {
+                            scope.launch {
+                                drawerState.close()
+                                navController.navigate(item.route)
+                            }
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                    )
                 }
             }
         }
-    ) {
+    )        {
         // Ana ekran içeriği
         Scaffold(
             topBar = {
