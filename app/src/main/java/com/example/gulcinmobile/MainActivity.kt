@@ -354,6 +354,9 @@ fun NewsScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+    // Haberlerin gösterilip gösterilmeyeceğini kontrol eden state
+    var showNews by remember { mutableStateOf(false) }
+
 
     // Kategori başlığını belirle
     val categoryTitle = when (category) {
@@ -438,18 +441,19 @@ fun NewsScreen(
         )
     )
     // Sayfaya girdiğimizde ilgili kategorinin haberlerini yükleme
-    LaunchedEffect(category) {
-        when (category) {
-            "general" -> viewModel.getGeneralNews()
-            "tech" -> viewModel.getTechNews()
-            "political" -> viewModel.getPoliticalNews()
-            "sports" -> viewModel.getSportsNews()
-            "business" -> viewModel.getBusinessNews()
-            "art" -> viewModel.getArtNews()
-            "entertainment" -> viewModel.getEntertainmentNews()
-            "ai" -> viewModel.getAINews()
-        }
-    }
+    // LaunchedEffect(category) {
+    //     when (category) {
+    //         "general" -> viewModel.getGeneralNews()
+    //         "tech" -> viewModel.getTechNews()
+    //         "political" -> viewModel.getPoliticalNews()
+    //         "sports" -> viewModel.getSportsNews()
+    //         "business" -> viewModel.getBusinessNews()
+    //         "art" -> viewModel.getArtNews()
+    //         "entertainment" -> viewModel.getEntertainmentNews()
+    //         "ai" -> viewModel.getAINews()
+    //     }
+    // }
+
 
     // Drawer layout
     ModalNavigationDrawer(
@@ -522,6 +526,7 @@ fun NewsScreen(
                     .background(Color(0xFFFFF8E1))
                     .padding(horizontal = 16.dp)
             ) {
+                Spacer(modifier = Modifier.weight(3f))
                 Button(
                     onClick = {
                         when (category) {
@@ -532,11 +537,14 @@ fun NewsScreen(
                             "business" -> viewModel.getBusinessNews()
                             "art" -> viewModel.getArtNews()
                             "entertainment" -> viewModel.getEntertainmentNews()
+                            "ai" -> viewModel.getAINews()
                         }
+                        // Butona tıklandığında haberleri göster
+                        showNews = true
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp)
+                        .padding(vertical = 8.dp)
                 ) {
                     Text(buttonText)
                 }
@@ -554,20 +562,63 @@ fun NewsScreen(
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
-                } else {
-                    // LazyColumn ile kaydırma özelliği ekliyoruz
+                } else if (showNews) {
+                    // Haberler gösterilecek
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Tüm haberleri gösteriyoruz
                         items(uiState.articles) { article ->
                             NewsCard(article = article)
                         }
                     }
+                } else {
+                    // Kategori görseli gösterilecek
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val imageRes = when (category) {
+                            "general" -> R.drawable.general_news
+                            "tech" -> R.drawable.tech_news
+                            "political" -> R.drawable.political_news
+                            "sports" -> R.drawable.sports_news
+                            "business" -> R.drawable.business_news
+                            "art" -> R.drawable.art_news
+                            "entertainment" -> R.drawable.entertainment_news
+                            "ai" -> R.drawable.ai_news
+                            else -> R.drawable.main_menu
+                        }
+
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            // Kategori başlığını kaldırdım
+
+                            Image(
+                                painter = painterResource(id = imageRes),
+                                contentDescription = categoryTitle,
+                                modifier = Modifier
+                                    .fillMaxWidth(0.9f) // Genişliği artırdım
+                                    .height(500.dp) // Yüksekliği artırdım
+                                    .clip(RoundedCornerShape(16.dp))
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                text = localStrings["tap_to_see_news"] ?: "Click the button to see the news.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 32.dp)
+                            )
+                        }
+
+                    }
                 }
             }
-
             if (showDialog) {
                 SettingsDialog(
                     currentLanguage = currentLanguage,
