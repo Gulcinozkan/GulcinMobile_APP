@@ -4,7 +4,6 @@ import com.example.gulcinmobile.model.GNewsResponse
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.util.Log
-import network.RssService
 
 class NewsRepository {
     private val retrofit = Retrofit.Builder()
@@ -14,6 +13,7 @@ class NewsRepository {
 
     private val apiService = retrofit.create(GNewsApiService::class.java)
     private val rssService = RssService()
+
 
     suspend fun searchTechNews(apiKey: String): GNewsResponse {
         // TechCrunch, The Verge ve Wired'dan teknoloji haberleri çekelim

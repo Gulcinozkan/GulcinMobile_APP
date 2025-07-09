@@ -68,8 +68,10 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
-// ✅ HTML Parser
-    implementation("org.jsoup:jsoup:1.15.3") // HTML içeriğini işlemek için
+
+    // ✅ HTML Parser
+    implementation("org.jsoup:jsoup:1.16.1") // HTML içeriğini işlemek için
+
 
 
     // ✅ Test Kütüphaneleri

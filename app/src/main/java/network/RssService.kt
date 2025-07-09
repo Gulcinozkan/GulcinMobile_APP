@@ -1,4 +1,4 @@
-package network
+package com.example.gulcinmobile.network
 
 import android.util.Log
 import com.example.gulcinmobile.model.GNewsArticle
@@ -9,11 +9,9 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.parser.Parser
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import java.util.regex.Pattern
 
 class RssService {
     // RSS feed URL'leri
@@ -82,7 +80,7 @@ class RssService {
             val xmlContent = fetchXmlContent(feedUrl)
             Log.d("RssService", "$sourceName XML içeriği çekildi (${xmlContent.length} karakter)")
 
-            val articles = parseRssFeed(xmlContent, sourceName)
+            val articles = parseRssFeedManually(xmlContent, sourceName)
             Log.d("RssService", "$sourceName için ${articles.size} makale parse edildi")
             articles
         } catch (e: Exception) {
@@ -109,68 +107,43 @@ class RssService {
         }
     }
 
-    private fun parseRssFeed(xmlContent: String, sourceName: String): List<GNewsArticle> {
+    private fun parseRssFeedManually(xmlContent: String, sourceName: String): List<GNewsArticle> {
         val articles = mutableListOf<GNewsArticle>()
 
         try {
-            // XML içeriğini Jsoup ile parse edelim
-            Log.d("RssService", "$sourceName XML içeriğini parse etmeye başlıyoruz")
-            val document = Jsoup.parse(xmlContent, "", Parser.xmlParser())
+            // <item> tag'lerini bulalım
+            val itemPattern = Pattern.compile("<item>(.*?)</item>", Pattern.DOTALL)
+            val itemMatcher = itemPattern.matcher(xmlContent)
 
-            // RSS item'larını bulalım
-            val items = document.select("item")
-            Log.d("RssService", "$sourceName için ${items.size} item bulundu")
+            while (itemMatcher.find()) {
+                val itemContent = itemMatcher.group(1)
+                if (itemContent != null) {
+                    // Başlık, açıklama, link ve resim URL'sini çıkaralım
+                    val title = extractTag(itemContent, "title")
+                    val description = extractTag(itemContent, "description")
+                    val link = extractTag(itemContent, "link")
 
-            for (item in items) {
-                val title = item.select("title").text()
-                val description = item.select("description").text()
-                val link = item.select("link").text()
-                val pubDate = item.select("pubDate").text()
+                    Log.d("RssService", "Makale işleniyor: $title")
 
-                Log.d("RssService", "Makale işleniyor: $title")
+                    // Resim URL'sini bulalım
+                    var imageUrl = extractImageUrl(itemContent)
 
-                // Resim URL'sini bulalım
-                var imageUrl: String? = null
-
-                // Enclosure tag'inden resim URL'sini almayı deneyelim
-                val enclosure = item.select("enclosure[type^=image]").firstOrNull()
-                if (enclosure != null) {
-                    imageUrl = enclosure.attr("url")
-                    Log.d("RssService", "Enclosure'dan resim URL'si bulundu: $imageUrl")
-                }
-
-                // Eğer enclosure'dan resim bulamazsak, description içindeki ilk resmi almayı deneyelim
-                if (imageUrl.isNullOrEmpty()) {
-                    imageUrl = findImageInDescription(description)
-                    if (!imageUrl.isNullOrEmpty()) {
-                        Log.d("RssService", "Description'dan resim URL'si bulundu: $imageUrl")
+                    // Eğer resim bulamazsak, varsayılan bir resim URL'si kullanabiliriz
+                    if (imageUrl.isNullOrEmpty()) {
+                        imageUrl = "https://via.placeholder.com/300x200?text=$sourceName"
+                        Log.d("RssService", "Resim bulunamadı, varsayılan resim kullanılıyor")
                     }
+
+                    val article = GNewsArticle(
+                        title = "$title - $sourceName",
+                        description = description,
+                        url = link,
+                        image = imageUrl
+                    )
+
+                    articles.add(article)
+                    Log.d("RssService", "Makale listeye eklendi: $title")
                 }
-
-                // Eğer hala resim bulamazsak, media:content tag'ini kontrol edelim
-                if (imageUrl.isNullOrEmpty()) {
-                    val mediaContent = item.select("media\\:content, content").firstOrNull()
-                    imageUrl = mediaContent?.attr("url")
-                    if (!imageUrl.isNullOrEmpty()) {
-                        Log.d("RssService", "Media content'ten resim URL'si bulundu: $imageUrl")
-                    }
-                }
-
-                // Eğer hiçbir yerden resim bulamazsak, varsayılan bir resim URL'si kullanabiliriz
-                if (imageUrl.isNullOrEmpty()) {
-                    imageUrl = "https://via.placeholder.com/300x200?text=$sourceName"
-                    Log.d("RssService", "Resim bulunamadı, varsayılan resim kullanılıyor")
-                }
-
-                val article = GNewsArticle(
-                    title = "$title - $sourceName",
-                    description = description,
-                    url = link,
-                    image = imageUrl
-                )
-
-                articles.add(article)
-                Log.d("RssService", "Makale listeye eklendi: $title")
             }
         } catch (e: Exception) {
             Log.e("RssService", "Error parsing RSS feed for $sourceName: ${e.message}", e)
@@ -179,18 +152,45 @@ class RssService {
         return articles
     }
 
-    private fun findImageInDescription(description: String): String? {
-        if (description.isEmpty()) return null
+    private fun extractTag(content: String, tagName: String): String {
+        val pattern = Pattern.compile("<$tagName>(.*?)</$tagName>", Pattern.DOTALL)
+        val matcher = pattern.matcher(content)
+        return if (matcher.find()) {
+            val result = matcher.group(1)?.trim() ?: ""
+            // HTML tag'lerini temizleyelim
+            result.replace(Regex("<.*?>"), "")
+        } else {
+            ""
+        }
+    }
 
-        try {
-            // HTML içeriğinden img tag'larını çıkaralım
-            val doc = Jsoup.parse(description)
-            val imgElements = doc.select("img")
-            if (imgElements.isNotEmpty()) {
-                return imgElements.first()?.attr("src")
-            }
-        } catch (e: Exception) {
-            Log.e("RssService", "Error parsing HTML content: ${e.message}", e)
+    private fun extractImageUrl(itemContent: String): String? {
+        // 1. Enclosure tag'inden resim URL'sini almayı deneyelim
+        val enclosurePattern = Pattern.compile("<enclosure[^>]*url=\"([^\"]+)\"[^>]*type=\"image/[^\"]+\"[^>]*/>")
+        val enclosureMatcher = enclosurePattern.matcher(itemContent)
+        if (enclosureMatcher.find()) {
+            val imageUrl = enclosureMatcher.group(1)
+            Log.d("RssService", "Enclosure'dan resim URL'si bulundu: $imageUrl")
+            return imageUrl
+        }
+
+        // 2. Media:content tag'inden resim URL'sini almayı deneyelim
+        val mediaPattern = Pattern.compile("<media:content[^>]*url=\"([^\"]+)\"[^>]*/>")
+        val mediaMatcher = mediaPattern.matcher(itemContent)
+        if (mediaMatcher.find()) {
+            val imageUrl = mediaMatcher.group(1)
+            Log.d("RssService", "Media content'ten resim URL'si bulundu: $imageUrl")
+            return imageUrl
+        }
+
+        // 3. Description içindeki ilk img tag'inden resim URL'sini almayı deneyelim
+        val description = extractTag(itemContent, "description")
+        val imgPattern = Pattern.compile("<img[^>]*src=\"([^\"]+)\"[^>]*>")
+        val imgMatcher = imgPattern.matcher(description)
+        if (imgMatcher.find()) {
+            val imageUrl = imgMatcher.group(1)
+            Log.d("RssService", "Description'dan resim URL'si bulundu: $imageUrl")
+            return imageUrl
         }
 
         return null
