@@ -21,6 +21,7 @@ val strings = mapOf(
         "business_news" to "Business News",
         "art_news" to "Art News",
         "entertainment_news" to "Entertainment News",
+        "ai_news" to "AI News",
         "show_general_news" to "Show Latest General News",
         "show_tech_news" to "Show Latest Technology News",
         "show_political_news" to "Show Latest Political News",
@@ -28,6 +29,7 @@ val strings = mapOf(
         "show_business_news" to "Show Latest Business News",
         "show_art_news" to "Show Latest Art News",
         "show_entertainment_news" to "Show Latest Entertainment News",
+        "show_ai_news" to "Show Latest AI News",
         "news" to "News",
         "continue" to "Continue to News App"
     ),
@@ -51,6 +53,7 @@ val strings = mapOf(
         "business_news" to "İş Dünyası Haberleri",
         "art_news" to "Sanat Haberleri",
         "entertainment_news" to "Magazin Haberleri",
+        "ai_news" to "Yapay Zeka Haberleri",
         "show_general_news" to "En Son Genel Haberleri Göster",
         "show_tech_news" to "En Son Teknoloji Haberlerini Göster",
         "show_political_news" to "En Son Siyasi Haberleri Göster",
@@ -58,6 +61,7 @@ val strings = mapOf(
         "show_business_news" to "En Son İş Dünyası Haberlerini Göster",
         "show_art_news" to "En Son Sanat Haberlerini Göster",
         "show_entertainment_news" to "En Son Magazin Haberlerini Göster",
+        "show_ai_news" to "En Son Yapay Zeka Haberlerini Göster",
         "news" to "Haberler",
         "continue" to "Haber Uygulamasına Devam Et"
     ),
@@ -81,6 +85,7 @@ val strings = mapOf(
         "business_news" to "Actualités économiques",
         "art_news" to "Actualités artistiques",
         "entertainment_news" to "Actualités de divertissement",
+        "ai_news" to "Actualités IA",
         "show_general_news" to "Afficher les dernières actualités générales",
         "show_tech_news" to "Afficher les dernières actualités technologiques",
         "show_political_news" to "Afficher les dernières actualités politiques",
@@ -88,6 +93,7 @@ val strings = mapOf(
         "show_business_news" to "Afficher les dernières actualités économiques",
         "show_art_news" to "Afficher les dernières actualités artistiques",
         "show_entertainment_news" to "Afficher les dernières actualités de divertissement",
+        "show_ai_news" to "Afficher les dernières actualités IA",
         "news" to "Actualités",
         "continue" to "Continuer vers l'application d'actualités"
     ),
@@ -111,6 +117,7 @@ val strings = mapOf(
         "business_news" to "Noticias de negocios",
         "art_news" to "Noticias de arte",
         "entertainment_news" to "Noticias de entretenimiento",
+        "ai_news" to "Noticias de IA",
         "show_general_news" to "Mostrar últimas noticias generales",
         "show_tech_news" to "Mostrar últimas noticias de tecnología",
         "show_political_news" to "Mostrar últimas noticias políticas",
@@ -118,6 +125,7 @@ val strings = mapOf(
         "show_business_news" to "Mostrar últimas noticias de negocios",
         "show_art_news" to "Mostrar últimas noticias de arte",
         "show_entertainment_news" to "Mostrar últimas noticias de entretenimiento",
+        "show_ai_news" to "Mostrar últimas noticias de IA",
         "news" to "Noticias",
         "continue" to "Continuar a la aplicación de noticias"
     ),
@@ -141,6 +149,7 @@ val strings = mapOf(
         "business_news" to "Wirtschaftsnachrichten",
         "art_news" to "Kunst-Nachrichten",
         "entertainment_news" to "Unterhaltungsnachrichten",
+        "ai_news" to "KI-Nachrichten",
         "show_general_news" to "Neueste allgemeine Nachrichten anzeigen",
         "show_tech_news" to "Neueste Technologie-Nachrichten anzeigen",
         "show_political_news" to "Neueste politische Nachrichten anzeigen",
@@ -148,6 +157,7 @@ val strings = mapOf(
         "show_business_news" to "Neueste Wirtschaftsnachrichten anzeigen",
         "show_art_news" to "Neueste Kunst-Nachrichten anzeigen",
         "show_entertainment_news" to "Neueste Unterhaltungsnachrichten anzeigen",
+        "show_ai_news" to "Neueste KI-Nachrichten anzeigen",
         "news" to "Nachrichten",
         "continue" to "Zur Nachrichten-App fortfahren"
     )

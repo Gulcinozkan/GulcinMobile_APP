@@ -1,4 +1,4 @@
-package com.example.gulcinmobile.network
+package network
 
 import android.util.Log
 import com.example.gulcinmobile.model.GNewsArticle
@@ -12,7 +12,6 @@ import okhttp3.Request
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
-
 class RssService {
     // RSS feed URL'leri
     private val techCrunchFeedUrl = "https://techcrunch.com/feed/"
@@ -139,6 +138,176 @@ class RssService {
             }
         }
     }
+
+    // AI ile ilgili teknoloji haberlerini çeken fonksiyon
+    suspend fun fetchAINews(): GNewsResponse {
+        Log.d("RssService", "fetchAINews başladı")
+        return withContext(Dispatchers.IO) {
+            try {
+                Log.d("RssService", "AI haberleri için RSS feed'lerini çekmeye başlıyoruz")
+
+                // Her kaynaktan daha fazla makale çekelim ve sonra AI ile ilgili olanları filtreleyelim
+                val techCrunchArticles = try {
+                    Log.d("RssService", "TechCrunch feed'ini çekmeye başlıyoruz")
+                    fetchFromSource(techCrunchFeedUrl, "TechCrunch")
+                } catch (e: Exception) {
+                    Log.e("RssService", "TechCrunch feed'i çekilemedi: ${e.message}", e)
+                    emptyList()
+                }
+
+                var vergeArticles = try {
+                    Log.d("RssService", "The Verge feed'ini çekmeye başlıyoruz")
+                    fetchFromSource(theVergeFeedUrl, "The Verge")
+                } catch (e: Exception) {
+                    Log.e("RssService", "The Verge feed'i çekilemedi: ${e.message}", e)
+                    emptyList()
+                }
+
+                // Eğer The Verge ana URL'den hiç makale çekilemezse, alternatif URL'yi deneyelim
+                if (vergeArticles.isEmpty()) {
+                    Log.d("RssService", "The Verge alternatif feed'i deneniyor")
+                    vergeArticles = try {
+                        fetchFromSource(theVergeFeedUrlAlternative, "The Verge")
+                    } catch (e: Exception) {
+                        Log.e("RssService", "The Verge alternatif feed'i de çekilemedi: ${e.message}", e)
+                        emptyList()
+                    }
+                }
+
+                val wiredArticles = try {
+                    Log.d("RssService", "Wired feed'ini çekmeye başlıyoruz")
+                    fetchFromSource(wiredFeedUrl, "Wired")
+                } catch (e: Exception) {
+                    Log.e("RssService", "Wired feed'i çekilemedi: ${e.message}", e)
+                    emptyList()
+                }
+
+                Log.d("RssService", "Tüm feed'ler çekildi, AI ile ilgili haberleri filtreliyoruz")
+
+                Log.d("RssService", "Tüm feed'ler çekildi, AI ile ilgili haberleri filtreliyoruz")
+
+                // AI ile ilgili anahtar kelimeleri tanımlayalım
+                val aiKeywords = listOf(
+                    // Genel AI terimleri - tam kelime eşleşmesi için
+                    " ai ", " ai,", " ai.", " ai-", "-ai ", "artificial intelligence", "machine learning",
+                    "deep learning", "neural network", "yapay zeka", "makine öğrenmesi", "derin öğrenme",
+
+                    // Spesifik AI modelleri ve şirketler
+                    "gpt", "chatgpt", "gpt-4", "gpt-5", "openai", "claude", "anthropic",
+                    "gemini", "google ai", "bard", "llama", "meta ai", "mistral ai",
+                    "llm", "large language model", "büyük dil modeli", "stable diffusion",
+
+                    // AI teknolojileri ve konseptler - daha spesifik terimler
+                    "generative ai", "üretken ai", "ai model", "ai assistant", "ai ethics",
+                    "computer vision", "bilgisayarlı görü", "nlp", "natural language processing",
+                    "doğal dil işleme", "reinforcement learning", "pekiştirmeli öğrenme",
+                    "transformer", "diffusion model", "multimodal", "çok modlu", "ai-powered",
+
+                    // AI uygulamaları - daha spesifik terimler
+                    "ai application", "ai tool", "ai image", "ai video", "ai audio",
+                    "ai code", "ai coding", "ai programming", "ai development",
+                    "autonomous", "otonom", "self-driving", "sürücüsüz", "ai research"
+                )
+
+                // Daha güçlü bir filtreleme için, başlıkta veya açıklamada en az bir AI anahtar kelimesi bulunmalı
+                // Her kaynaktan AI ile ilgili makaleleri filtreleyelim
+                val aiTechCrunchArticles = techCrunchArticles.filter { article ->
+                    val titleLower = article.title?.lowercase() ?: ""
+                    val descLower = article.description?.lowercase() ?: ""
+
+                    // Başlıkta veya açıklamada en az bir AI anahtar kelimesi bulunmalı
+                    aiKeywords.any { keyword ->
+                        titleLower.contains(keyword) || descLower.contains(keyword)
+                    }
+                }
+
+                val aiVergeArticles = vergeArticles.filter { article ->
+                    val titleLower = article.title?.lowercase() ?: ""
+                    val descLower = article.description?.lowercase() ?: ""
+
+                    // Başlıkta veya açıklamada en az bir AI anahtar kelimesi bulunmalı
+                    aiKeywords.any { keyword ->
+                        titleLower.contains(keyword) || descLower.contains(keyword)
+                    }
+                }
+
+                val aiWiredArticles = wiredArticles.filter { article ->
+                    val titleLower = article.title?.lowercase() ?: ""
+                    val descLower = article.description?.lowercase() ?: ""
+
+                    // Başlıkta veya açıklamada en az bir AI anahtar kelimesi bulunmalı
+                    aiKeywords.any { keyword ->
+                        titleLower.contains(keyword) || descLower.contains(keyword)
+                    }
+                }
+                Log.d("RssService", "AI ile ilgili makaleler - TechCrunch: ${aiTechCrunchArticles.size}, " +
+                        "The Verge: ${aiVergeArticles.size}, Wired: ${aiWiredArticles.size}")
+
+                // İstenen dağılım: 3 TechCrunch, 3 The Verge, 4 Wired (mümkünse)
+                val targetTechCrunch = 3
+                val targetVerge = 3
+                val targetWired = 4
+
+                // Her kaynaktan kaç makale alacağımızı belirleyelim
+                val techCrunchCount = minOf(targetTechCrunch, aiTechCrunchArticles.size)
+                val vergeCount = minOf(targetVerge, aiVergeArticles.size)
+                val wiredCount = minOf(targetWired, aiWiredArticles.size)
+
+                // Makaleleri birleştirelim
+                val allAIArticles = mutableListOf<GNewsArticle>()
+
+                // TechCrunch makalelerini ekleyelim
+                allAIArticles.addAll(aiTechCrunchArticles.take(techCrunchCount))
+
+                // The Verge makalelerini ekleyelim
+                allAIArticles.addAll(aiVergeArticles.take(vergeCount))
+
+                // Wired makalelerini ekleyelim
+                allAIArticles.addAll(aiWiredArticles.take(wiredCount))
+
+                // Eğer toplam 10'dan az makale varsa, eksik olanları diğer kaynaklardan tamamlayalım
+                val totalArticles = techCrunchCount + vergeCount + wiredCount
+                if (totalArticles < 10) {
+                    Log.d("RssService", "Toplam $totalArticles AI makalesi bulundu, 10'a tamamlamaya çalışılıyor")
+
+                    // Önce Wired'dan eksikleri tamamlamaya çalışalım
+                    if (aiWiredArticles.size > wiredCount) {
+                        val extraWired = minOf(10 - totalArticles, aiWiredArticles.size - wiredCount)
+                        allAIArticles.addAll(aiWiredArticles.subList(wiredCount, wiredCount + extraWired))
+                        Log.d("RssService", "Ek olarak $extraWired Wired AI makalesi eklendi")
+                    }
+
+                    // Hala eksikse, TechCrunch'tan tamamlayalım
+                    val currentTotal = allAIArticles.size
+                    if (currentTotal < 10 && aiTechCrunchArticles.size > techCrunchCount) {
+                        val extraTechCrunch = minOf(10 - currentTotal, aiTechCrunchArticles.size - techCrunchCount)
+                        allAIArticles.addAll(aiTechCrunchArticles.subList(techCrunchCount, techCrunchCount + extraTechCrunch))
+                        Log.d("RssService", "Ek olarak $extraTechCrunch TechCrunch AI makalesi eklendi")
+                    }
+
+                    // Hala eksikse, The Verge'den tamamlayalım
+                    val updatedTotal = allAIArticles.size
+                    if (updatedTotal < 10 && aiVergeArticles.size > vergeCount) {
+                        val extraVerge = minOf(10 - updatedTotal, aiVergeArticles.size - vergeCount)
+                        allAIArticles.addAll(aiVergeArticles.subList(vergeCount, vergeCount + extraVerge))
+                        Log.d("RssService", "Ek olarak $extraVerge The Verge AI makalesi eklendi")
+                    }
+                }
+
+                Log.d("RssService", "Toplam ${allAIArticles.size} AI makalesi döndürülüyor")
+
+                GNewsResponse(
+                    totalArticles = allAIArticles.size,
+                    articles = allAIArticles
+                )
+            } catch (e: Exception) {
+                Log.e("RssService", "Error fetching AI news: ${e.message}", e)
+                // Hata durumunda boş liste döndür
+                GNewsResponse(totalArticles = 0, articles = emptyList())
+            }
+        }
+    }
+
 
     private suspend fun fetchFromSource(feedUrl: String, sourceName: String): List<GNewsArticle> {
         return try {

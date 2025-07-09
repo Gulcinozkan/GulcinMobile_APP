@@ -1,9 +1,10 @@
-package com.example.gulcinmobile.network
+package network
 
 import com.example.gulcinmobile.model.GNewsResponse
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import android.util.Log
+import network.RssService
 
 class NewsRepository {
     private val retrofit = Retrofit.Builder()
@@ -56,5 +57,18 @@ class NewsRepository {
     suspend fun searchEntertainmentNews(apiKey: String): GNewsResponse {
         val query = "celebrity OR entertainment OR movie OR music OR fashion"
         return apiService.searchNews(query, "en", apiKey)
+    }
+
+    suspend fun searchAINews(apiKey: String): GNewsResponse {
+        // TechCrunch, The Verge ve Wired'dan AI ile ilgili haberleri çekelim
+        Log.d("NewsRepository", "AI haberleri çekiliyor")
+        try {
+            val response = rssService.fetchAINews()
+            Log.d("NewsRepository", "AI haberleri başarıyla çekildi: ${response.articles.size} makale")
+            return response
+        } catch (e: Exception) {
+            Log.e("NewsRepository", "AI haberleri çekilirken hata oluştu: ${e.message}", e)
+            return GNewsResponse(totalArticles = 0, articles = emptyList())
+        }
     }
 }

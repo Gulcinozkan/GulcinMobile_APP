@@ -88,6 +88,9 @@ class MainActivity : ComponentActivity() {
                     composable("entertainment_news") {
                         NewsScreen(navController = navController, category = "entertainment")
                     }
+                    composable("ai_news") {
+                        NewsScreen(navController = navController, category = "ai")
+                    }
                 }
             }
         }
@@ -175,6 +178,12 @@ fun MainScreen(
             route = "entertainment_news",
             icon = Icons.Outlined.Movie,
             contentDescription = "Entertainment News"
+        ),
+        DrawerItem(
+            title = localStrings["ai_news"] ?: "AI News",
+            route = "ai_news",
+            icon = Icons.Outlined.Computer,
+            contentDescription = "AI News"
         )
     )
 
@@ -339,6 +348,7 @@ fun NewsScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
+
     // Kategori başlığını belirle
     val categoryTitle = when (category) {
         "general" -> localStrings["general_news"] ?: "General News"
@@ -348,6 +358,7 @@ fun NewsScreen(
         "business" -> localStrings["business_news"] ?: "Business News"
         "art" -> localStrings["art_news"] ?: "Art News"
         "entertainment" -> localStrings["entertainment_news"] ?: "Entertainment News"
+        "ai" -> localStrings["ai_news"] ?: "AI News"
         else -> localStrings["news"] ?: "News"
     }
 
@@ -360,9 +371,9 @@ fun NewsScreen(
         "business" -> localStrings["show_business_news"] ?: "Show Latest Business News"
         "art" -> localStrings["show_art_news"] ?: "Show Latest Art News"
         "entertainment" -> localStrings["show_entertainment_news"] ?: "Show Latest Entertainment News"
+        "ai" -> localStrings["show_ai_news"] ?: "Show Latest AI News"
         else -> localStrings["show_news"] ?: "Show Latest News"
     }
-
     // Drawer menü öğeleri
     val drawerItems = listOf(
         DrawerItem(
@@ -419,6 +430,7 @@ fun NewsScreen(
             "business" -> viewModel.getBusinessNews()
             "art" -> viewModel.getArtNews()
             "entertainment" -> viewModel.getEntertainmentNews()
+            "ai" -> viewModel.getAINews()
         }
     }
 

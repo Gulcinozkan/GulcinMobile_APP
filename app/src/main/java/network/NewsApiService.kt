@@ -1,4 +1,4 @@
-package com.example.gulcinmobile.network
+package network
 
 import com.example.gulcinmobile.model.GNewsResponse
 import retrofit2.http.GET

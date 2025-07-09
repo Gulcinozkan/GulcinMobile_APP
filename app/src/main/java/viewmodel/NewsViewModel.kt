@@ -11,7 +11,7 @@ import com.example.gulcinmobile.model.TranslatedText
 import com.example.gulcinmobile.model.TranslationRequest
 import com.example.gulcinmobile.model.TranslationResponseItem
 import com.example.gulcinmobile.network.MicrosoftTranslateService
-import com.example.gulcinmobile.network.NewsRepository
+import network.NewsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -113,6 +113,12 @@ class NewsViewModel(private val context: Context) : ViewModel() {
         currentCategory = "entertainment"
         fetchNews { repository.searchEntertainmentNews(apiKey) }
     }
+    // AI haberleri
+    fun getAINews() {
+        currentCategory = "ai"
+        fetchNews { repository.searchAINews(apiKey) }
+    }
+
 
     // Ortak haber çekme fonksiyonu
     private fun fetchNews(newsSource: suspend () -> com.example.gulcinmobile.model.GNewsResponse) {
