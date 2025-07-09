@@ -30,8 +30,18 @@ class NewsRepository {
     }
 
     suspend fun searchGeneralNews(apiKey: String): GNewsResponse {
-        val query = "world news OR breaking news"
-        return apiService.searchNews(query, "en", apiKey)
+        // Diğer kategorilerde olmayan genel haberleri çekelim
+        Log.d("NewsRepository", "Genel haberler çekiliyor")
+        try {
+            val response = rssService.fetchGeneralNews()
+            Log.d("NewsRepository", "Genel haberler başarıyla çekildi: ${response.articles.size} makale")
+            return response
+        } catch (e: Exception) {
+            Log.e("NewsRepository", "Genel haberler çekilirken hata oluştu: ${e.message}", e)
+            // Eğer RSS servisinden çekme başarısız olursa, GNews API'sini deneyelim
+            val query = "world news OR breaking news"
+            return apiService.searchNews(query, "en", apiKey)
+        }
     }
 
     suspend fun searchPoliticalNews(apiKey: String): GNewsResponse {

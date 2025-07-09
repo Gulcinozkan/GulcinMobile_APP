@@ -308,6 +308,271 @@ class RssService {
         }
     }
 
+    // Genel haberleri çeken fonksiyon - doğal afetler ve aktif savaşlarla ilgili haberler
+    suspend fun fetchGeneralNews(): GNewsResponse {
+        Log.d("RssService", "fetchGeneralNews başladı")
+        return withContext(Dispatchers.IO) {
+            try {
+                Log.d("RssService", "Genel haberler için RSS feed'lerini çekmeye başlıyoruz")
+
+                // Her kaynaktan haberleri çekelim
+                val techCrunchArticles = try {
+                    Log.d("RssService", "TechCrunch feed'ini çekmeye başlıyoruz")
+                    fetchFromSource(techCrunchFeedUrl, "TechCrunch")
+                } catch (e: Exception) {
+                    Log.e("RssService", "TechCrunch feed'i çekilemedi: ${e.message}", e)
+                    emptyList()
+                }
+
+                var vergeArticles = try {
+                    Log.d("RssService", "The Verge feed'ini çekmeye başlıyoruz")
+                    fetchFromSource(theVergeFeedUrl, "The Verge")
+                } catch (e: Exception) {
+                    Log.e("RssService", "The Verge feed'i çekilemedi: ${e.message}", e)
+                    emptyList()
+                }
+
+                // Eğer The Verge ana URL'den hiç makale çekilemezse, alternatif URL'yi deneyelim
+                if (vergeArticles.isEmpty()) {
+                    Log.d("RssService", "The Verge alternatif feed'i deneniyor")
+                    vergeArticles = try {
+                        fetchFromSource(theVergeFeedUrlAlternative, "The Verge")
+                    } catch (e: Exception) {
+                        Log.e("RssService", "The Verge alternatif feed'i de çekilemedi: ${e.message}", e)
+                        emptyList()
+                    }
+                }
+
+                val wiredArticles = try {
+                    Log.d("RssService", "Wired feed'ini çekmeye başlıyoruz")
+                    fetchFromSource(wiredFeedUrl, "Wired")
+                } catch (e: Exception) {
+                    Log.e("RssService", "Wired feed'i çekilemedi: ${e.message}", e)
+                    emptyList()
+                }
+
+                Log.d("RssService", "Tüm feed'ler çekildi, doğal afet ve savaş haberleri filtreleniyor")
+
+                // Diğer kategorilerde kullanılan anahtar kelimeleri tanımlayalım (bunları hariç tutacağız)
+                val techKeywords = listOf(
+                    "technology", "tech", "software", "hardware", "app", "smartphone", "gadget",
+                    "computer", "internet", "digital", "mobile", "device", "innovation"
+                )
+
+                val politicalKeywords = listOf(
+                    "election", "vote", "campaign", "democrat", "republican", "parliament"
+                )
+
+                val sportsKeywords = listOf(
+                    "sports", "football", "basketball", "tennis", "olympics", "game", "match",
+                    "player", "team", "championship", "tournament", "league", "athlete"
+                )
+
+                val businessKeywords = listOf(
+                    "business", "economy", "finance", "stock market", "investment", "company",
+                    "startup", "entrepreneur", "market", "trade", "industry", "economic"
+                )
+
+                val artKeywords = listOf(
+                    "art", "exhibition", "museum", "painting", "sculpture", "artist",
+                    "gallery", "creative", "design", "culture", "artistic"
+                )
+
+                val entertainmentKeywords = listOf(
+                    "celebrity", "entertainment", "movie", "music", "fashion", "film",
+                    "actor", "actress", "singer", "star", "hollywood", "tv", "show"
+                )
+
+                val aiKeywords = listOf(
+                    "ai", "artificial intelligence", "machine learning", "deep learning",
+                    "neural network", "gpt", "chatgpt", "openai", "claude", "gemini"
+                )
+
+                // Doğal afet ve savaş haberleri ile ilgili anahtar kelimeleri tanımlayalım
+                val disasterWarKeywords = listOf(
+                    // Doğal afetler
+                    "disaster", "natural disaster", "earthquake", "flood", "hurricane", "tornado",
+                    "tsunami", "wildfire", "forest fire", "volcanic eruption", "volcano", "landslide",
+                    "drought", "famine", "extreme weather", "climate disaster", "storm", "typhoon",
+                    "cyclone", "blizzard", "avalanche", "mudslide",
+
+                    // Türkçe doğal afet kelimeleri
+                    "doğal afet", "deprem", "sel", "kasırga", "hortum", "tsunami", "yangın",
+                    "orman yangını", "volkan", "volkanik", "heyelan", "kuraklık", "kıtlık",
+                    "aşırı hava", "iklim felaketi", "fırtına", "tayfun", "çığ", "çamur",
+
+                    // Savaşlar ve çatışmalar
+                    "war", "conflict", "battle", "fighting", "combat", "military", "attack",
+                    "invasion", "troops", "soldier", "army", "navy", "air force", "bombing",
+                    "missile", "airstrike", "ceasefire", "peace talks", "hostage", "refugee",
+                    "casualties", "killed", "wounded", "dead", "death toll", "violence",
+                    "terrorism", "terrorist", "insurgent", "rebellion", "civil war", "genocide",
+                    "ethnic cleansing", "humanitarian crisis", "displaced", "evacuation",
+
+                    // Türkçe savaş kelimeleri
+                    "savaş", "çatışma", "muharebe", "askeri", "saldırı", "işgal", "asker",
+                    "ordu", "donanma", "hava kuvvetleri", "bombalama", "füze", "hava saldırısı",
+                    "ateşkes", "barış görüşmeleri", "rehine", "mülteci", "kayıp", "ölü", "yaralı",
+                    "can kaybı", "şiddet", "terörizm", "terörist", "isyancı", "iç savaş", "soykırım",
+                    "insani kriz", "tahliye",
+
+                    // Özel savaş bölgeleri ve güncel çatışmalar
+                    "ukraine", "russia", "gaza", "israel", "palestine", "hamas", "syria", "yemen",
+                    "sudan", "myanmar", "ethiopia", "somalia", "iraq", "afghanistan", "libya",
+                    "ukrayna", "rusya", "gazze", "israil", "filistin", "suriye", "yemen",
+                    "sudan", "myanmar", "etiyopya", "somali", "irak", "afganistan", "libya"
+                )
+
+                // Tüm kategori anahtar kelimelerini birleştirelim (hariç tutulacaklar)
+                val excludeCategoryKeywords = techKeywords + sportsKeywords +
+                        businessKeywords + artKeywords + entertainmentKeywords + aiKeywords
+
+                // Doğal afet ve savaş haberleri ile ilgili makaleleri filtreleyelim
+                val disasterWarTechCrunchArticles = techCrunchArticles.filter { article ->
+                    val titleLower = article.title?.lowercase() ?: ""
+                    val descLower = article.description?.lowercase() ?: ""
+                    val contentToSearch = "$titleLower $descLower"
+
+                    // Doğal afet veya savaş ile ilgili en az bir anahtar kelime içermeli
+                    disasterWarKeywords.any { keyword -> contentToSearch.contains(keyword) }
+                }
+
+                val disasterWarVergeArticles = vergeArticles.filter { article ->
+                    val titleLower = article.title?.lowercase() ?: ""
+                    val descLower = article.description?.lowercase() ?: ""
+                    val contentToSearch = "$titleLower $descLower"
+
+                    disasterWarKeywords.any { keyword -> contentToSearch.contains(keyword) }
+                }
+
+                val disasterWarWiredArticles = wiredArticles.filter { article ->
+                    val titleLower = article.title?.lowercase() ?: ""
+                    val descLower = article.description?.lowercase() ?: ""
+                    val contentToSearch = "$titleLower $descLower"
+
+                    disasterWarKeywords.any { keyword -> contentToSearch.contains(keyword) }
+                }
+
+                // Eğer yeterli doğal afet ve savaş haberi bulamazsak, genel dünya haberleri de ekleyelim
+                val worldNewsKeywords = listOf(
+                    "world", "global", "international", "nation", "country", "countries",
+                    "europe", "asia", "africa", "america", "australia", "middle east",
+                    "united nations", "un", "nato", "eu", "european union", "g7", "g20",
+                    "climate", "environment", "crisis", "agreement", "summit", "conference",
+                    "pandemic", "epidemic", "emergency", "humanitarian", "migration", "protest",
+                    "demonstration", "dünya", "küresel", "uluslararası", "ülke", "ülkeler",
+                    "avrupa", "asya", "afrika"
+                )
+
+                val worldTechCrunchArticles = techCrunchArticles.filter { article ->
+                    val titleLower = article.title?.lowercase() ?: ""
+                    val descLower = article.description?.lowercase() ?: ""
+                    val contentToSearch = "$titleLower $descLower"
+
+                    // Dünya haberleri ile ilgili en az bir anahtar kelime içermeli
+                    // VE doğal afet/savaş listesinde olmamalı
+                    worldNewsKeywords.any { keyword -> contentToSearch.contains(keyword) } &&
+                            !disasterWarTechCrunchArticles.contains(article) &&
+                            // Diğer kategorilerin anahtar kelimelerini içermemeli (politik haberler hariç)
+                            !excludeCategoryKeywords.any { keyword -> contentToSearch.contains(keyword) }
+                }
+
+                val worldVergeArticles = vergeArticles.filter { article ->
+                    val titleLower = article.title?.lowercase() ?: ""
+                    val descLower = article.description?.lowercase() ?: ""
+                    val contentToSearch = "$titleLower $descLower"
+
+                    worldNewsKeywords.any { keyword -> contentToSearch.contains(keyword) } &&
+                            !disasterWarVergeArticles.contains(article) &&
+                            !excludeCategoryKeywords.any { keyword -> contentToSearch.contains(keyword) }
+                }
+
+                val worldWiredArticles = wiredArticles.filter { article ->
+                    val titleLower = article.title?.lowercase() ?: ""
+                    val descLower = article.description?.lowercase() ?: ""
+                    val contentToSearch = "$titleLower $descLower"
+
+                    worldNewsKeywords.any { keyword -> contentToSearch.contains(keyword) } &&
+                            !disasterWarWiredArticles.contains(article) &&
+                            !excludeCategoryKeywords.any { keyword -> contentToSearch.contains(keyword) }
+                }
+
+                Log.d("RssService", "Doğal afet ve savaş haberleri - TechCrunch: ${disasterWarTechCrunchArticles.size}, " +
+                        "The Verge: ${disasterWarVergeArticles.size}, Wired: ${disasterWarWiredArticles.size}")
+                Log.d("RssService", "Dünya haberleri - TechCrunch: ${worldTechCrunchArticles.size}, " +
+                        "The Verge: ${worldVergeArticles.size}, Wired: ${worldWiredArticles.size}")
+
+                // İstenen dağılım: 3 TechCrunch, 3 The Verge, 4 Wired (mümkünse)
+                val targetTechCrunch = 3
+                val targetVerge = 3
+                val targetWired = 4
+
+                // Önce doğal afet ve savaş haberleri ile ilgili olanları ekleyelim
+                val allGeneralArticles = mutableListOf<GNewsArticle>()
+
+                // TechCrunch doğal afet ve savaş haberleri
+                val disasterWarTechCrunchCount = minOf(targetTechCrunch, disasterWarTechCrunchArticles.size)
+                allGeneralArticles.addAll(disasterWarTechCrunchArticles.take(disasterWarTechCrunchCount))
+
+                // The Verge doğal afet ve savaş haberleri
+                val disasterWarVergeCount = minOf(targetVerge, disasterWarVergeArticles.size)
+                allGeneralArticles.addAll(disasterWarVergeArticles.take(disasterWarVergeCount))
+
+                // Wired doğal afet ve savaş haberleri
+                val disasterWarWiredCount = minOf(targetWired, disasterWarWiredArticles.size)
+                allGeneralArticles.addAll(disasterWarWiredArticles.take(disasterWarWiredCount))
+
+                // Eğer doğal afet ve savaş haberleri yeterli değilse, dünya haberleriyle tamamlayalım
+                val remainingTechCrunch = targetTechCrunch - disasterWarTechCrunchCount
+                if (remainingTechCrunch > 0) {
+                    allGeneralArticles.addAll(worldTechCrunchArticles.take(remainingTechCrunch))
+                }
+
+                val remainingVerge = targetVerge - disasterWarVergeCount
+                if (remainingVerge > 0) {
+                    allGeneralArticles.addAll(worldVergeArticles.take(remainingVerge))
+                }
+
+                val remainingWired = targetWired - disasterWarWiredCount
+                if (remainingWired > 0) {
+                    allGeneralArticles.addAll(worldWiredArticles.take(remainingWired))
+                }
+
+                // Eğer toplam 10'dan az makale varsa, eksik olanları diğer kaynaklardan tamamlayalım
+                val totalArticles = allGeneralArticles.size
+                if (totalArticles < 10) {
+                    Log.d("RssService", "Toplam $totalArticles genel makale bulundu, 10'a tamamlamaya çalışılıyor")
+
+                    // Yeterli haber bulunamadıysa, filtrelemeyi biraz gevşetelim
+                    // ve daha az kategori anahtar kelimesi içeren haberleri alalım
+                    val remainingArticles = (techCrunchArticles + vergeArticles + wiredArticles).filter { article ->
+                        !allGeneralArticles.any { it.title == article.title }
+                        // Teknoloji, spor, sanat ve eğlence haberlerini hariç tutalım
+                        val titleLower = article.title?.lowercase() ?: ""
+                        val descLower = article.description?.lowercase() ?: ""
+                        val contentToSearch = "$titleLower $descLower"
+
+                        !excludeCategoryKeywords.any { keyword -> contentToSearch.contains(keyword) }
+                    }.take(10 - totalArticles)
+
+                    // Kalan makaleleri ekleyelim
+                    allGeneralArticles.addAll(remainingArticles)
+                }
+
+                Log.d("RssService", "Toplam ${allGeneralArticles.size} genel makale döndürülüyor")
+
+                GNewsResponse(
+                    totalArticles = allGeneralArticles.size,
+                    articles = allGeneralArticles
+                )
+            } catch (e: Exception) {
+                Log.e("RssService", "Genel haberler çekilirken hata oluştu: ${e.message}", e)
+                GNewsResponse(totalArticles = 0, articles = emptyList())
+            }
+        }
+    }
+
+
 
     private suspend fun fetchFromSource(feedUrl: String, sourceName: String): List<GNewsArticle> {
         return try {
