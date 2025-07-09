@@ -35,7 +35,7 @@ fun WelcomeScreen(navController: NavController) {
             Image(
                 painter = painterResource(id = R.drawable.gulcin_logo),
                 contentDescription = "Logo",
-                modifier = Modifier.size(250.dp)
+                modifier = Modifier.size(350.dp)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
