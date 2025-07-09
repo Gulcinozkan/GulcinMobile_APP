@@ -233,7 +233,7 @@ fun MainScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(localStrings["app_title"] ?: "AI News") },
+                    title = { Text("GulcinMobile") },
                     navigationIcon = {
                         IconButton(onClick = {
                             scope.launch {
@@ -252,7 +252,10 @@ fun MainScreen(
                         }) {
                             Icon(Icons.Default.Settings, contentDescription = localStrings["settings"] ?: "Settings")
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color(0xFFF5F5DC) // Arka plan renginden biraz daha koyu sarı
+                    )
                 )
             }
         ) { paddingValues ->
@@ -279,16 +282,16 @@ fun MainScreen(
                             letterSpacing = 0.5.sp,
                             fontSize = 54.sp
                         ),
-                        color = Color(0xFF8BC34A), // Açık yeşil
+                        color = Color(0xFF1B5E20), // Açık yeşil
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(bottom = 64.dp)
                     )
 
                     Text(
-                        text = "Haberler ile ilgili son gelişmeleri görmek için menüye tıklayınız.",
+                        text = "En güncel gelişmeleri, yapay zekâdan siyasete, teknolojiden spora kadar her kategoride takip etmek için yukarıdaki menüden ilgini çeken başlığa tıklayarak göz atabilir, dünya gündeminden anında haberdar olabilirsiniz.",
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            fontSize = 24.sp
+                            fontSize = 18.sp
                         ),
                         color = Color(0xFF33691E), // Koyu yeşil
                         textAlign = TextAlign.Center,
@@ -482,7 +485,7 @@ fun NewsScreen(
             }
         }
     )        {
-        // Ana ekran içeriği
+        // Haber ekranı içeriği
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -505,7 +508,10 @@ fun NewsScreen(
                         }) {
                             Icon(Icons.Default.Settings, contentDescription = localStrings["settings"] ?: "Settings")
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color(0xFFF5F5DC) // Arka plan renginden biraz daha koyu sarı
+                    )
                 )
             }
         ) { paddingValues ->
