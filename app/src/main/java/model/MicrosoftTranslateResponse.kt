@@ -9,3 +9,4 @@ data class MicrosoftTranslateResponse(
     val translations: List<MicrosoftTranslation>
 )
 
+

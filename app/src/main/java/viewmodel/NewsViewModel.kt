@@ -165,69 +165,71 @@ class NewsViewModel(private val context: Context) : ViewModel() {
     private fun translateArticles(articles: List<GNewsArticle>) {
         Log.d("NewsViewModel", "Starting translation of ${articles.size} articles to $selectedLanguageCode")
 
-        // Eğer dil İngilizceyse, çeviriye gerek yok
         if (selectedLanguageCode == "en") {
             _uiState.value = NewsUiState(articles = articles, isLoading = false)
             Log.d("NewsViewModel", "Language is English, no translation needed")
             return
         }
 
-        // En fazla 5 makaleyi çevirelim (API limitleri için)
         val articlesToTranslate = articles.take(5)
         val translatedArticles = mutableListOf<GNewsArticle>()
-        val pendingTranslations = AtomicInteger(articlesToTranslate.size * 2) // Her makale için başlık ve açıklama
 
-        Log.d("NewsViewModel", "Will translate ${articlesToTranslate.size} articles (${pendingTranslations.get()} texts total)")
+        // Yeni: Başlık ve açıklamaları eşleştirmek için map
+        val translationMap = mutableMapOf<GNewsArticle, Pair<String?, String?>>()
 
-        // Her makale için başlık ve açıklamayı çevir
         for (article in articlesToTranslate) {
             val title = article.title
             val description = article.description ?: ""
 
-            // Başlık ve açıklama için geçici değişkenler
-            var translatedTitle = ""
-            var translatedDescription = ""
-
             // Başlığı çevir
-            Log.d("NewsViewModel", "Translating title: ${title.take(30)}...")
-            translateText(title) { result ->
-                translatedTitle = result
-                Log.d("NewsViewModel", "Title translated: ${result.take(30)}...")
+            translateText(title) { translatedTitle ->
+                val current = translationMap[article] ?: Pair(null, null)
+                translationMap[article] = Pair(translatedTitle, current.second)
 
-                // Çeviri tamamlandığında sayacı azalt
-                if (pendingTranslations.decrementAndGet() == 0) {
-                    // Tüm çeviriler tamamlandı, UI'ı güncelle
-                    Log.d("NewsViewModel", "All translations complete, updating UI")
-                    _uiState.value = NewsUiState(articles = translatedArticles, isLoading = false)
+                if (translatedTitle != null && current.second != null) {
+                    addTranslatedArticle(article, translatedTitle, current.second!!, translatedArticles, articlesToTranslate.size)
                 }
             }
 
             // Açıklamayı çevir
-            Log.d("NewsViewModel", "Translating description: ${description.take(30)}...")
-            translateText(description) { result ->
-                translatedDescription = result
-                Log.d("NewsViewModel", "Description translated: ${result.take(30)}...")
+            translateText(description) { translatedDescription ->
+                val current = translationMap[article] ?: Pair(null, null)
+                translationMap[article] = Pair(current.first, translatedDescription)
 
-                // Yeni çevrilmiş makale oluştur
-                val translatedArticle = GNewsArticle(
-                    title = if (translatedTitle.isNotBlank()) translatedTitle else title,
-                    description = result,
-                    url = article.url,
-                    image = article.image
-                )
-
-                translatedArticles.add(translatedArticle)
-                Log.d("NewsViewModel", "Added translated article to list")
-
-                // Çeviri tamamlandığında sayacı azalt
-                if (pendingTranslations.decrementAndGet() == 0) {
-                    // Tüm çeviriler tamamlandı, UI'ı güncelle
-                    Log.d("NewsViewModel", "All translations complete, updating UI")
-                    _uiState.value = NewsUiState(articles = translatedArticles, isLoading = false)
+                if (current.first != null && translatedDescription != null) {
+                    addTranslatedArticle(article, current.first!!, translatedDescription, translatedArticles, articlesToTranslate.size)
                 }
             }
         }
+        originalArticles = translatedArticles.toList()
+
     }
+
+    private fun addTranslatedArticle(
+        original: GNewsArticle,
+        title: String,
+        description: String,
+        translatedArticles: MutableList<GNewsArticle>,
+        totalToTranslate: Int
+    ) {
+        val translatedArticle = GNewsArticle(
+            title = title,
+            description = description,
+            url = original.url,
+            image = original.image
+        )
+
+        translatedArticles.add(translatedArticle)
+        Log.d("NewsViewModel", "Çevrilmiş haber eklendi: ${title.take(30)}")
+
+        if (translatedArticles.size == totalToTranslate) {
+            Log.d("NewsViewModel", "Tüm çeviriler tamamlandı, UI güncelleniyor")
+            originalArticles = translatedArticles.toList() // ✅ BU SATIR!
+            _uiState.value = NewsUiState(articles = translatedArticles, isLoading = false)
+        }
+    }
+
+
 
     private fun translateText(text: String, onComplete: (String) -> Unit) {
         // Boş metin kontrolü
