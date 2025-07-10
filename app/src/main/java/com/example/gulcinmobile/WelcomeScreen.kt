@@ -19,7 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 @Composable
 fun WelcomeScreen(navController: NavController) {
     LaunchedEffect(true) {
-        delay(4000)
+        delay(2000)
         navController.navigate("main") {
             popUpTo("welcome") { inclusive = true }
         }
