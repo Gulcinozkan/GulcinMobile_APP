@@ -125,13 +125,18 @@ fun MainScreen(
     // Track language changes
     var currentLanguage by remember { mutableStateOf(viewModel.selectedLanguageCode) }
 
+    // LaunchedEffect to load language when screen first opens
+    LaunchedEffect(key1 = Unit) {
+        val savedLanguage = viewModel.loadSavedLanguage()
+        currentLanguage = savedLanguage
+    }
+
     // Get localized strings based on selected language
     val localStrings = strings[currentLanguage] ?: strings["en"] ?: mapOf()
 
     var showDialog by remember { mutableStateOf(false) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
 
 
     // Drawer menü öğeleri

@@ -72,6 +72,14 @@ class NewsViewModel(private val context: Context) : ViewModel() {
         }
     }
 
+    // Kaydedilmiş dil tercihini yükle
+    suspend fun loadSavedLanguage(): String {
+        val savedLanguage = dataStoreManager.getLanguage()
+        selectedLanguageCode = savedLanguage
+        Log.d("NewsViewModel", "Explicitly loaded language preference: $savedLanguage")
+        return savedLanguage
+    }
+
     // Teknoloji haberleri
     fun getTechNews() {
         currentCategory = "tech"
