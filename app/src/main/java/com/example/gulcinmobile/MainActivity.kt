@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.currentBackStackEntryAsState
+import kotlinx.coroutines.delay
 
 
 class MainActivity : ComponentActivity() {
@@ -366,6 +367,20 @@ fun NewsScreen(
     // Haberlerin gösterilip gösterilmeyeceğini kontrol eden state
     var showNews by remember { mutableStateOf(false) }
 
+// Haberleri yükleyen ve gösteren fonksiyon
+    val loadAndShowNews = {
+        when (category) {
+            "general" -> viewModel.getGeneralNews()
+            "tech" -> viewModel.getTechNews()
+            "political" -> viewModel.getPoliticalNews()
+            "sports" -> viewModel.getSportsNews()
+            "business" -> viewModel.getBusinessNews()
+            "art" -> viewModel.getArtNews()
+            "entertainment" -> viewModel.getEntertainmentNews()
+            "ai" -> viewModel.getAINews()
+        }
+        showNews = true
+    }
 
     // Kategori başlığını belirle
     val categoryTitle = when (category) {
@@ -545,20 +560,7 @@ fun NewsScreen(
             ) {
                 Spacer(modifier = Modifier.weight(3f))
                 Button(
-                    onClick = {
-                        when (category) {
-                            "general" -> viewModel.getGeneralNews()
-                            "tech" -> viewModel.getTechNews()
-                            "political" -> viewModel.getPoliticalNews()
-                            "sports" -> viewModel.getSportsNews()
-                            "business" -> viewModel.getBusinessNews()
-                            "art" -> viewModel.getArtNews()
-                            "entertainment" -> viewModel.getEntertainmentNews()
-                            "ai" -> viewModel.getAINews()
-                        }
-                        // Butona tıklandığında haberleri göster
-                        showNews = true
-                    },
+                    onClick = loadAndShowNews,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp)
@@ -579,6 +581,23 @@ fun NewsScreen(
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
+                } else if (uiState.isLoading) {
+                    // Yükleme göstergesi
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = localStrings["loading"] ?: "Loading...",
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                    }
                 } else if (showNews) {
                     // Haberler gösterilecek
                     LazyColumn(
@@ -640,14 +659,21 @@ fun NewsScreen(
                 }
             }
             if (showDialog) {
+
                 SettingsDialog(
                     currentLanguage = currentLanguage,
                     onDismiss = { showDialog = false },
                     onSave = { newLang ->
                         coroutineScope.launch {
+                            // Dil değişiminde haberleri gizle
+                            showNews = false
                             viewModel.updateLanguage(newLang)
                             currentLanguage = newLang // Apply language change immediately
                             showDialog = false
+
+                            // Dil değişiminden sonra butona otomatik tıklama simüle et
+                            delay(500) // Kısa bir gecikme ekle
+                            loadAndShowNews()  // Bu satır yeni eklendi
                         }
                     }
                 )

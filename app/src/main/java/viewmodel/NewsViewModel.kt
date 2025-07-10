@@ -304,6 +304,10 @@ class NewsViewModel(private val context: Context) : ViewModel() {
         viewModelScope.launch {
             Log.d("NewsViewModel", "Updating language from $selectedLanguageCode to $languageCode")
             dataStoreManager.saveLanguage(languageCode)
+
+            // Önce haberleri temizle ve yükleme durumunu aktif et
+            _uiState.value = NewsUiState(isLoading = true, articles = emptyList())
+
             selectedLanguageCode = languageCode
 
             // Eğer haber yoksa bir şey yapma
