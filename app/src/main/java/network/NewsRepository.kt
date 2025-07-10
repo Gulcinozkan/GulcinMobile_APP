@@ -17,7 +17,7 @@ class NewsRepository {
 
 
     suspend fun searchTechNews(apiKey: String): GNewsResponse {
-        // TechCrunch, The Verge ve Wired'dan teknoloji haberleri çekelim
+        // TechCrunch, The Verge ve Wired'dan teknoloji haberleri çeker
         Log.d("NewsRepository", "Teknoloji haberleri çekiliyor")
         try {
             val response = rssService.fetchTechNews()
@@ -30,7 +30,7 @@ class NewsRepository {
     }
 
     suspend fun searchGeneralNews(apiKey: String): GNewsResponse {
-        // Diğer kategorilerde olmayan genel haberleri çekelim
+        // Diğer kategorilerde olmayan genel haberleri çeker
         Log.d("NewsRepository", "Genel haberler çekiliyor")
         try {
             val response = rssService.fetchGeneralNews()
@@ -38,7 +38,7 @@ class NewsRepository {
             return response
         } catch (e: Exception) {
             Log.e("NewsRepository", "Genel haberler çekilirken hata oluştu: ${e.message}", e)
-            // Eğer RSS servisinden çekme başarısız olursa, GNews API'sini deneyelim
+            // Eğer RSS servisinden çekme başarısız olursa, GNews API'sini dener
             val query = "world news OR breaking news"
             return apiService.searchNews(query, "en", apiKey)
         }
@@ -70,7 +70,7 @@ class NewsRepository {
     }
 
     suspend fun searchAINews(apiKey: String): GNewsResponse {
-        // TechCrunch, The Verge ve Wired'dan AI ile ilgili haberleri çekelim
+        // TechCrunch, The Verge ve Wired'dan AI ile ilgili haberleri çeker
         Log.d("NewsRepository", "AI haberleri çekiliyor")
         try {
             val response = rssService.fetchAINews()

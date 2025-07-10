@@ -215,7 +215,6 @@ fun MainScreen(
                 // Menü öğeleri
                 val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
                 drawerItems.forEach { item ->
-                    // Tüm menü öğelerini her zaman göster
                     NavigationDrawerItem(
                         icon = { Icon(item.icon, contentDescription = item.contentDescription) },
                         label = { Text(item.title) },
@@ -265,7 +264,7 @@ fun MainScreen(
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(0xFFF5F5DC), // Arka plan renginden biraz daha koyu sarı
+                        containerColor = Color(0xFFF5F5DC),
                         titleContentColor = Color.Black,
                         navigationIconContentColor = Color.Black,
                         actionIconContentColor = Color.Black
@@ -282,7 +281,6 @@ fun MainScreen(
                     .padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Yazılar (üst kısımda)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -297,7 +295,7 @@ fun MainScreen(
                             letterSpacing = 0.5.sp,
                             fontSize = 54.sp
                         ),
-                        color = Color(0xFF1B5E20), // Açık yeşil
+                        color = Color(0xFF1B5E20),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(bottom = 64.dp)
@@ -308,7 +306,7 @@ fun MainScreen(
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 18.sp
                         ),
-                        color = Color(0xFF33691E), // Koyu yeşil
+                        color = Color(0xFF33691E),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 32.dp)
                     )
@@ -316,7 +314,7 @@ fun MainScreen(
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Görsel (alt kısımda)
+
                 Image(
                     painter = painterResource(id = R.drawable.main_menu),
                     contentDescription = "Gulcin Mobile Logo",
@@ -336,7 +334,7 @@ fun MainScreen(
                     onSave = { newLang ->
                         coroutineScope.launch {
                             viewModel.updateLanguage(newLang)
-                            currentLanguage = newLang // Apply language change immediately
+                            currentLanguage = newLang
                             showDialog = false
                         }
                     }
@@ -501,7 +499,6 @@ fun NewsScreen(
                 // Menü öğeleri
                 val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
                 drawerItems.forEach { item ->
-                    // Tüm menü öğelerini her zaman göster
                     NavigationDrawerItem(
                         icon = { Icon(item.icon, contentDescription = item.contentDescription) },
                         label = { Text(item.title) },
@@ -637,9 +634,9 @@ fun NewsScreen(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 1.dp) // Üstten boşluğu azalttım
+                                .padding(top = 1.dp)
                         ) {
-                            // Fotoğrafı daha üste aldım
+
                             Image(
                                 painter = painterResource(id = imageRes),
                                 contentDescription = categoryTitle,
@@ -670,15 +667,13 @@ fun NewsScreen(
                     onDismiss = { showDialog = false },
                     onSave = { newLang ->
                         coroutineScope.launch {
-                            // Dil değişiminde haberleri gizle
                             showNews = false
                             viewModel.updateLanguage(newLang)
                             currentLanguage = newLang // Apply language change immediately
                             showDialog = false
 
-                            // Dil değişiminden sonra butona otomatik tıklama simüle et
-                            delay(500) // Kısa bir gecikme ekle
-                            loadAndShowNews()  // Bu satır yeni eklendi
+                            delay(500)
+                            loadAndShowNews()
                         }
                     }
                 )

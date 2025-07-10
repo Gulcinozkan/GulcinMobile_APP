@@ -19,7 +19,7 @@ class RssService {
     private val theVergeFeedUrlAlternative = "https://www.theverge.com/rss/front-page/index.xml" // Alternatif The Verge URL'si
     private val wiredFeedUrl = "https://www.wired.com/feed/rss"
 
-    // Daha uzun timeout süresi ile OkHttpClient oluşturalım
+
     private val client = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -133,7 +133,6 @@ class RssService {
                 )
             } catch (e: Exception) {
                 Log.e("RssService", "Error fetching tech news: ${e.message}", e)
-                // Hata durumunda boş liste döndür
                 GNewsResponse(totalArticles = 0, articles = emptyList())
             }
         }
@@ -580,7 +579,7 @@ class RssService {
             val xmlContent = fetchXmlContent(feedUrl)
             Log.d("RssService", "$sourceName XML içeriği çekildi (${xmlContent.length} karakter)")
 
-            // XML içeriğini logcat'e yazdıralım (debug için)
+
             Log.d("RssService", "XML içeriği (ilk 500 karakter): ${xmlContent.take(500)}")
 
             val articles = when (sourceName) {

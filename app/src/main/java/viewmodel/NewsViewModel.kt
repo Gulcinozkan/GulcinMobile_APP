@@ -232,7 +232,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
 
         if (translatedArticles.size == totalToTranslate) {
             Log.d("NewsViewModel", "Tüm çeviriler tamamlandı, UI güncelleniyor")
-            originalArticles = translatedArticles.toList() // ✅ BU SATIR!
+            originalArticles = translatedArticles.toList()
             _uiState.value = NewsUiState(articles = translatedArticles, isLoading = false)
         }
     }

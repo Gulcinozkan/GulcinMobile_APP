@@ -22,7 +22,7 @@ class DataStoreManager(private val context: Context) {
 
     suspend fun getLanguage(): String {
         return context.dataStore.data
-            .map { preferences -> preferences[SELECTED_LANGUAGE] ?: "tr" }
+            .map { preferences -> preferences[SELECTED_LANGUAGE] ?: "en" }
             .first()
     }
 }

@@ -8,7 +8,7 @@ import retrofit2.Call
 interface MicrosoftTranslateService {
     @Headers(
         "Content-Type: application/json",
-        "Ocp-Apim-Subscription-Region: southeastasia" // 🔥 Bunu ekle!
+        "Ocp-Apim-Subscription-Region: southeastasia"
     )
     @POST("translate")
     fun translateDynamic(
