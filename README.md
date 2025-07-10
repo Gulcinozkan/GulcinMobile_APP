@@ -1,60 +1,50 @@
-# 🤖 GülçinMobile
+# GülçinMobile – AI & Global News App 📰💡
 
 ![Logo](app/src/main/res/drawable/gulcin_logo.png)
 
-**GülçinMobile**, teknoloji haberlerini anlık olarak çeken ve tek tıklamayla Türkçeye çeviren modern bir Android uygulamasıdır. Kullanıcı dostu arayüzü, hızlı performansı ve şık tasarımıyla mobil deneyimi bir üst seviyeye çıkarır. 🚀
 
----
+GülçinMobile, yapay zeka ve teknoloji odaklı haberlerle birlikte genel, spor, sanat gibi farklı kategorilerde haberleri bir araya getiren, çok dilli bir haber uygulamasıdır. Jetpack Compose ile geliştirilmiş bu modern Android uygulama, kullanıcılara sade ve hızlı bir arayüz sunar.
 
-## 🛠 Özellikler
+## ✨ Özellikler
 
-- 🔍 Teknoloji haberlerini canlı olarak çekme (GNews API)
-- 🌐 Microsoft Translate API ile anında Türkçe çeviri
-- 🖼 Şık açılış ekranı ve modern tasarım (Jetpack Compose)
-- 📱 Responsive UI – Tüm cihaz boyutlarına uyumlu
+- 📚 **Kategori Bazlı Haberler**  
+  Menü üzerinden şu kategorilerde haberleri görüntüleyebilirsin:
+  - General News
+  - Technology News (TechCrunch, The Verge, Wired kaynaklı)
+  - AI News
+  - Political News
+  - Sports News
+  - Business News
+  - Art News
+  - Entertainment News
 
----
+- 📌 **Son 5 Haber Gösterimi**  
+  Her kategori içerisinde, ilgili alandaki en güncel 5 haber başlık ve özetleriyle gösterilir.
 
-## 💻 Kullanılan Teknolojiler
+- 🌐 **Dil Desteği (Çok Dilli Arayüz ve Haber Çevirisi)**  
+  Uygulama arayüzü ve haberler; Türkçe, English, Español, Français, Deutsch, العربية, 日本語, Русский ve 简体中文 dillerinde görüntülenebilir.
 
-- **Kotlin** (Jetpack Compose)
-- **Retrofit** – API çağrıları için
-- **Microsoft Translator API** – Çeviri işlemleri için
-- **State Management** – ViewModel + StateFlow
-- **Material3** UI bileşenleri
-- **Coroutines** – Asenkron işlemler için
+- 🔧 **Ayarlar Ekranı**  
+  Sağ üstteki ayarlar ikonuna tıklayarak dil seçimi yapılabilir. Seçilen dil kalıcı olarak kaydedilir.
 
----
+## 🧩 Kullanılan API’ler
 
-## 🚀 Uygulama Akışı
+| Amaç               | API                          |
+|--------------------|------------------------------|
+| Teknoloji Haberleri| TechCrunch, Wired, The Verge |
+| Diğer Haberler     | GNews API                    |
+| Çeviri             | Microsoft Translate API      |
 
-1. Açılış ekranı (Splash) gösterilir.
-2. Ana sayfada haber başlıkları yüklenir.
-3. Her başlık altında “Çevir” butonu bulunur.
-4. Butona tıklanarak anlık çeviri yapılır.
-5. Tüm işlemler hızlı ve kullanıcı dostudur.
+## 🛠️ Kullanılan Teknolojiler
 
----
+- **Kotlin**
+- **Jetpack Compose**
+- **ViewModel + State Management**
+- **DataStore (dil ayarlarını kalıcı tutmak için)**
+- **Retrofit (API çağrıları için)**
 
 
-## 🧪 Çalıştırmak İçin
+## 🚀 Kurulum
 
-1. Android Studio ile aç
-2. `gradle` senkronize et
-3. `News API Key` ve `Microsoft Translate API Key` ekle (gerekirse)
-4. Çalıştır ve keyfine bak! 🎉
-
----
-
-## 👩‍💻 Geliştirici
-
-**Gülçin 🌸**  
-> Android tutkunu, yapay zekaya meraklı ve çeviri dostu bir uygulamanın annesi!
-
----
-
-## 🌟 Desteklemek İçin
-
-Projeyi beğendiysen ⭐ yıldızlamayı ve forku unutma!  
-Her geri bildirim, GülçinMobile'ı daha ileri taşır ✨
-
+```bash
+git clone https://github.com/kendi-kod-deposu/gulcinmobile.git
