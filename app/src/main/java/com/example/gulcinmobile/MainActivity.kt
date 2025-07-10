@@ -232,8 +232,9 @@ fun MainScreen(
         // Ana ekran içeriği
         Scaffold(
             topBar = {
+
                 TopAppBar(
-                    title = { Text("GulcinMobile") },
+                    title = { Text("GulcinMobile", color = Color.Black) },
                     navigationIcon = {
                         IconButton(onClick = {
                             scope.launch {
@@ -242,7 +243,8 @@ fun MainScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
-                                contentDescription = localStrings["menu"] ?: "Menu"
+                                contentDescription = localStrings["menu"] ?: "Menu",
+                                tint = Color.Black
                             )
                         }
                     },
@@ -250,11 +252,17 @@ fun MainScreen(
                         IconButton(onClick = {
                             showDialog = true
                         }) {
-                            Icon(Icons.Default.Settings, contentDescription = localStrings["settings"] ?: "Settings")
+                            Icon(Icons.Default.Settings,
+                                contentDescription = localStrings["settings"] ?: "Settings",
+                                tint = Color.Black
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(0xFFF5F5DC) // Arka plan renginden biraz daha koyu sarı
+                        containerColor = Color(0xFFF5F5DC), // Arka plan renginden biraz daha koyu sarı
+                        titleContentColor = Color.Black,
+                        navigationIconContentColor = Color.Black,
+                        actionIconContentColor = Color.Black
                     )
                 )
             }
@@ -275,8 +283,9 @@ fun MainScreen(
                         .padding(top = 32.dp, bottom = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+
                     Text(
-                        text = "GulcinMobile'a Hoş Geldiniz",
+                        text = localStrings["welcome_title"] ?: "Welcome to GulcinMobile",
                         style = MaterialTheme.typography.displayMedium.copy(
                             fontWeight = FontWeight.ExtraBold,
                             letterSpacing = 0.5.sp,
@@ -289,7 +298,7 @@ fun MainScreen(
                     )
 
                     Text(
-                        text = "En güncel gelişmeleri, yapay zekâdan siyasete, teknolojiden spora kadar her kategoride takip etmek için yukarıdaki menüden ilgini çeken başlığa tıklayarak göz atabilir, dünya gündeminden anında haberdar olabilirsiniz.",
+                        text = localStrings["welcome_description"] ?: "Follow the latest developments in every category from AI to politics, from technology to sports by clicking on the topic that interests you from the menu above, and be instantly informed about the world agenda.",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontSize = 18.sp
                         ),
@@ -492,8 +501,9 @@ fun NewsScreen(
         // Haber ekranı içeriği
         Scaffold(
             topBar = {
+
                 TopAppBar(
-                    title = { Text(categoryTitle) },
+                    title = { Text("GulcinMobile", color = Color.Black) },
                     navigationIcon = {
                         IconButton(onClick = {
                             scope.launch {
@@ -502,7 +512,8 @@ fun NewsScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
-                                contentDescription = localStrings["menu"] ?: "Menu"
+                                contentDescription = localStrings["menu"] ?: "Menu",
+                                tint = Color.Black
                             )
                         }
                     },
@@ -510,11 +521,17 @@ fun NewsScreen(
                         IconButton(onClick = {
                             showDialog = true
                         }) {
-                            Icon(Icons.Default.Settings, contentDescription = localStrings["settings"] ?: "Settings")
+                            Icon(Icons.Default.Settings,
+                                contentDescription = localStrings["settings"] ?: "Settings",
+                                tint = Color.Black
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color(0xFFF5F5DC) // Arka plan renginden biraz daha koyu sarı
+                        containerColor = Color(0xFFF5F5DC), // Arka plan renginden biraz daha koyu sarı
+                        titleContentColor = Color.Black,
+                        navigationIconContentColor = Color.Black,
+                        actionIconContentColor = Color.Black
                     )
                 )
             }
@@ -591,22 +608,25 @@ fun NewsScreen(
                         }
 
 
+
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 1.dp) // Üstten boşluğu azalttım
                         ) {
-                            // Kategori başlığını kaldırdım
-
+                            // Fotoğrafı daha üste aldım
                             Image(
                                 painter = painterResource(id = imageRes),
                                 contentDescription = categoryTitle,
                                 modifier = Modifier
-                                    .fillMaxWidth(0.9f) // Genişliği artırdım
-                                    .height(500.dp) // Yüksekliği artırdım
+                                    .fillMaxWidth(0.9f)
+                                    .height(500.dp)
                                     .clip(RoundedCornerShape(16.dp))
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(3.dp))
+
 
                             Text(
                                 text = localStrings["tap_to_see_news"] ?: "Click the button to see the news.",

@@ -31,7 +31,11 @@ val strings = mapOf(
         "show_entertainment_news" to "Show Latest Entertainment News",
         "show_ai_news" to "Show Latest AI News",
         "news" to "News",
-        "continue" to "Continue to News App"
+        "continue" to "Continue to News App",
+        "welcome_title" to "Welcome to GulcinMobile",
+        "welcome_description" to "Follow the latest developments in every category from AI to politics, from technology to sports by clicking on the topic that interests you from the menu above, and be instantly informed about the world agenda.",
+        "tap_to_see_news" to "Click the button to see the news."
+
     ),
     "tr" to mapOf(
         "home" to "Ana Menü",
@@ -63,7 +67,10 @@ val strings = mapOf(
         "show_entertainment_news" to "En Son Magazin Haberlerini Göster",
         "show_ai_news" to "En Son Yapay Zeka Haberlerini Göster",
         "news" to "Haberler",
-        "continue" to "Haber Uygulamasına Devam Et"
+        "continue" to "Haber Uygulamasına Devam Et",
+        "welcome_title" to "GulcinMobile'a Hoş Geldiniz",
+        "welcome_description" to "En güncel gelişmeleri, yapay zekâdan siyasete, teknolojiden spora kadar her kategoride takip etmek için yukarıdaki menüden ilgini çeken başlığa tıklayarak göz atabilir, dünya gündeminden anında haberdar olabilirsiniz.",
+        "tap_to_see_news" to "Haberleri görmek için butona tıklayın."
     ),
     "fr" to mapOf(
         "home" to "Accueil",
@@ -95,7 +102,10 @@ val strings = mapOf(
         "show_entertainment_news" to "Afficher les dernières actualités de divertissement",
         "show_ai_news" to "Afficher les dernières actualités IA",
         "news" to "Actualités",
-        "continue" to "Continuer vers l'application d'actualités"
+        "continue" to "Continuer vers l'application d'actualités",
+        "welcome_title" to "Bienvenue sur GulcinMobile",
+        "welcome_description" to "Suivez les derniers développements dans chaque catégorie, de l'IA à la politique, de la technologie au sport, en cliquant sur le sujet qui vous intéresse dans le menu ci-dessus, et soyez instantanément informé de l'actualité mondiale.",
+        "tap_to_see_news" to "Cliquez sur le bouton pour voir les actualités."
     ),
     "es" to mapOf(
         "home" to "Inicio",
@@ -127,7 +137,10 @@ val strings = mapOf(
         "show_entertainment_news" to "Mostrar últimas noticias de entretenimiento",
         "show_ai_news" to "Mostrar últimas noticias de IA",
         "news" to "Noticias",
-        "continue" to "Continuar a la aplicación de noticias"
+        "continue" to "Continuar a la aplicación de noticias",
+        "welcome_title" to "Bienvenido a GulcinMobile",
+        "welcome_description" to "Siga los últimos desarrollos en cada categoría, desde IA hasta política, desde tecnología hasta deportes, haciendo clic en el tema que le interese en el menú de arriba, y esté instantáneamente informado sobre la agenda mundial.",
+        "tap_to_see_news" to "Haga clic en el botón para ver las noticias."
     ),
     "de" to mapOf(
         "home" to "Startseite",
@@ -159,7 +172,10 @@ val strings = mapOf(
         "show_entertainment_news" to "Neueste Unterhaltungsnachrichten anzeigen",
         "show_ai_news" to "Neueste KI-Nachrichten anzeigen",
         "news" to "Nachrichten",
-        "continue" to "Zur Nachrichten-App fortfahren"
+        "continue" to "Zur Nachrichten-App fortfahren",
+        "welcome_title" to "Willkommen bei GulcinMobile",
+        "welcome_description" to "Verfolgen Sie die neuesten Entwicklungen in jeder Kategorie, von KI bis Politik, von Technologie bis Sport, indem Sie im obigen Menü auf das Thema klicken, das Sie interessiert, und werden Sie sofort über die Weltlage informiert.",
+        "tap_to_see_news" to "Klicken Sie auf die Schaltfläche, um die Nachrichten zu sehen."
     ),
     "ja" to mapOf(
         "home" to "ホーム",
@@ -191,7 +207,10 @@ val strings = mapOf(
         "show_entertainment_news" to "最新のエンタメニュースを表示",
         "show_ai_news" to "最新のAIニュースを表示",
         "news" to "ニュース",
-        "continue" to "ニュースアプリへ進む"
+        "continue" to "ニュースアプリへ進む",
+        "welcome_title" to "GulcinMobileへようこそ",
+        "welcome_description" to "上記のメニューから興味のあるトピックをクリックして、AIから政治、テクノロジーからスポーツまで、あらゆるカテゴリの最新情報をフォローし、世界の議題について即座に情報を得ることができます。",
+        "tap_to_see_news" to "ニュースを見るにはボタンをクリックしてください。"
     ),
     "ar" to mapOf(
         "home" to "الرئيسية",
@@ -223,7 +242,10 @@ val strings = mapOf(
         "show_entertainment_news" to "عرض آخر أخبار الترفيه",
         "show_ai_news" to "عرض آخر أخبار الذكاء الاصطناعي",
         "news" to "الأخبار",
-        "continue" to "الانتقال إلى تطبيق الأخبار"
+        "continue" to "الانتقال إلى تطبيق الأخبار",
+        "welcome_title" to "مرحبًا بك في GulcinMobile",
+        "welcome_description" to "تابع أحدث التطورات في كل فئة من الذكاء الاصطناعي إلى السياسة، ومن التكنولوجيا إلى الرياضة من خلال النقر على الموضوع الذي يهمك من القائمة أعلاه، وكن على اطلاع فوري بجدول أعمال العالم.",
+        "tap_to_see_news" to "انقر على الزر لرؤية الأخبار."
     ),
     "ru" to mapOf(
         "home" to "Главная",
@@ -255,7 +277,10 @@ val strings = mapOf(
         "show_entertainment_news" to "Показать последние новости развлечений",
         "show_ai_news" to "Показать последние новости ИИ",
         "news" to "Новости",
-        "continue" to "Перейти к приложению новостей"
+        "continue" to "Перейти к приложению новостей",
+        "welcome_title" to "Добро пожаловать в GulcinMobile",
+        "welcome_description" to "Следите за последними событиями в каждой категории, от ИИ до политики, от технологий до спорта, нажав на интересующую вас тему в меню выше, и мгновенно получайте информацию о мировой повестке дня.",
+        "tap_to_see_news" to "Нажмите на кнопку, чтобы увидеть новости."
     ),
     "zh" to mapOf(
         "home" to "首页",
@@ -287,6 +312,9 @@ val strings = mapOf(
         "show_entertainment_news" to "显示最新娱乐新闻",
         "show_ai_news" to "显示最新人工智能新闻",
         "news" to "新闻",
-        "continue" to "继续进入新闻应用"
+        "continue" to "继续进入新闻应用",
+        "welcome_title" to "欢迎使用GulcinMobile",
+        "welcome_description" to "通过点击上面菜单中您感兴趣的主题，关注从人工智能到政治、从技术到体育等各个类别的最新发展，并即时了解世界议程。",
+        "tap_to_see_news" to "点击按钮查看新闻。"
     )
 )

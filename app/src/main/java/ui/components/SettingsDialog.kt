@@ -21,7 +21,7 @@ fun SettingsDialog(
         "ar" to "العربية",
         "ja" to "日本語",
         "ru" to "Русский",
-        "zh-Hans" to "简体中文"
+        "zh" to "简体中文"
     )
 
     var selectedLang by remember { mutableStateOf(currentLanguage) }
