@@ -179,7 +179,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
             return
         }
 
-        val articlesToTranslate = articles.take(5)
+        val articlesToTranslate = articles.take(10)
         val translatedArticles = mutableListOf<GNewsArticle>()
 
         // Yeni: Başlık ve açıklamaları eşleştirmek için map

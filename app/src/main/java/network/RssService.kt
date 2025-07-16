@@ -878,7 +878,26 @@ class RssService {
 
         // Açıklamayı kısaltalım (en fazla 150 karakter)
         if (cleanDesc.length > 150) {
-            cleanDesc = cleanDesc.substring(0, 147) + "..."
+            // Cümle sonunda bitirmeye çalışalım
+            var cutIndex = 147
+
+            // 150 karakter içinde son noktalama işaretini bul
+            for (i in 150 downTo 50) {
+                if (i < cleanDesc.length && (cleanDesc[i] == '.' || cleanDesc[i] == '!' || cleanDesc[i] == '?')) {
+                    cutIndex = i + 1 // Noktalama işaretinden sonraki pozisyonu al
+                    break
+                }
+            }
+
+            // Noktalama işareti bulunamadıysa en yakın boşlukta kes
+            if (cutIndex == 147) {
+                val lastSpace = cleanDesc.lastIndexOf(' ', 147)
+                if (lastSpace > 80) { // En az 80 karakter göster
+                    cutIndex = lastSpace
+                }
+            }
+
+            cleanDesc = cleanDesc.substring(0, cutIndex) + "."
         }
 
         return cleanDesc
