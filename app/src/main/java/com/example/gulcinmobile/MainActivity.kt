@@ -1,17 +1,27 @@
 package com.example.gulcinmobile
 
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Business
 import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.Home
@@ -25,37 +35,43 @@ import androidx.compose.material.icons.filled.SportsSoccer
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import coil.compose.AsyncImage
+import com.example.gulcinmobile.R
 import com.example.gulcinmobile.ui.components.NewsCard
 import com.example.gulcinmobile.ui.components.SettingsDialog
 import com.example.gulcinmobile.ui.components.strings
 import com.example.gulcinmobile.ui.theme.GulcinMobileTheme
 import com.example.gulcinmobile.viewmodel.NewsViewModel
 import com.example.gulcinmobile.viewmodel.NewsViewModelFactory
-import kotlinx.coroutines.launch
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.currentBackStackEntryAsState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import java.net.URLDecoder
+import java.net.URLEncoder
 
 
 class MainActivity : ComponentActivity() {
@@ -65,6 +81,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             GulcinMobileTheme {
                 val navController = rememberNavController()
+
                 NavHost(navController = navController, startDestination = "welcome") {
                     composable("welcome") { WelcomeScreen(navController) }
                     composable("main") {
@@ -93,6 +110,13 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("ai_news") {
                         NewsScreen(navController = navController, category = "ai")
+                    }
+                    composable(
+                        route = "news_detail/{encodedUrl}",
+                        arguments = listOf(navArgument("encodedUrl") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val encodedUrl = backStackEntry.arguments?.getString("encodedUrl") ?: ""
+                        NewsDetailScreen(navController = navController, newsUrl = encodedUrl)
                     }
                 }
             }
@@ -607,7 +631,14 @@ fun NewsScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(uiState.articles) { article ->
-                            NewsCard(article = article)
+                            NewsCard(
+                                article = article,
+                                onItemClick = {
+                                    // URL'yi kodlayarak detay sayfasına yönlendirme
+                                    val encodedUrl = URLEncoder.encode(article.url, "UTF-8")
+                                    navController.navigate("news_detail/$encodedUrl")
+                                }
+                            )
                         }
                     }
                 } else {
@@ -677,6 +708,200 @@ fun NewsScreen(
                         }
                     }
                 )
+            }
+        }
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NewsDetailScreen(
+    navController: NavController,
+    newsUrl: String
+) {
+    val context = LocalContext.current
+    val viewModel: NewsViewModel = viewModel(
+        factory = NewsViewModelFactory(context)
+    )
+    val uiState by viewModel.uiState.collectAsState()
+
+    // URL'yi çözümle
+    val decodedUrl = remember(newsUrl) {
+        try {
+            URLDecoder.decode(newsUrl, "UTF-8")
+        } catch (e: Exception) {
+            Log.e("NewsDetailScreen", "URL decode error: ${e.message ?: "Unknown error"}")
+            newsUrl
+        }
+    }
+
+    // Seçilen dile göre yerelleştirme
+    val localStrings = strings[viewModel.selectedLanguageCode] ?: strings["en"] ?: mapOf()
+    val detailTitle = localStrings["news_detail"] ?: "Haber Detayı"
+    val sourceButtonText = localStrings["go_to_source"] ?: "Haber Kaynağına Git"
+    val loadingText = localStrings["loading"] ?: "Yükleniyor..."
+    val contentNotFoundText = localStrings["content_not_found"] ?: "İçerik bulunamadı"
+    val noImageText = localStrings["no_image"] ?: "Görsel Yok"
+    val goBackText = localStrings["go_back"] ?: "Geri Dön"
+
+    // Haber detaylarını bul
+    var newsArticle by remember { mutableStateOf<com.example.gulcinmobile.model.GNewsArticle?>(null) }
+
+    // LaunchedEffect ile haber arama işlemini gerçekleştir
+    LaunchedEffect(decodedUrl) {
+        newsArticle = viewModel.findArticleByUrl(decodedUrl)
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(detailTitle) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Geri")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            if (uiState.isLoading) {
+                // Yükleniyor göstergesi
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(loadingText)
+                }
+            } else if (newsArticle != null) {
+                // Haber detayları
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    // Haber başlığı
+                    Text(
+                        text = newsArticle!!.title,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Haber görseli yerine haber başlığını gösteren bir kutu
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.LightGray),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = newsArticle!!.title,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.DarkGray,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // İçerik başlığı
+                    Text(
+                        text = "İçerik",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Haber açıklaması - Card içinde daha belirgin gösteriyoruz
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    ) {
+                        Text(
+                            text = newsArticle!!.description ?: contentNotFoundText,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Kaynak bilgisi
+                    Text(
+                        text = "Kaynak: ${Uri.parse(newsArticle!!.url).host}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontStyle = FontStyle.Italic
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Haber kaynağına git butonu - daha belirgin hale getiriyoruz
+                    Button(
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(newsArticle!!.url))
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(
+                            Icons.Filled.OpenInBrowser,
+                            contentDescription = null,
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text(sourceButtonText, style = MaterialTheme.typography.titleMedium)
+                    }
+                }
+            } else {
+                // İçerik bulunamadı durumu
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        Icons.Filled.Error,
+                        contentDescription = null,
+                        modifier = Modifier.size(64.dp),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = contentNotFoundText,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = "Haber detayları hafızada bulunamadı. Geri dönüp haberi tekrar seçmeyi deneyin.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 32.dp, vertical = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.Filled.ArrowBack,
+                            contentDescription = null,
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text(goBackText)
+                    }
+                }
+
             }
         }
     }

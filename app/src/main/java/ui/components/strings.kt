@@ -35,7 +35,15 @@ val strings = mapOf(
         "welcome_title" to "Welcome to GulcinMobile",
         "welcome_description" to "Follow the latest developments in every category from AI to politics, from technology to sports by clicking on the topic that interests you from the menu above, and be instantly informed about the world agenda.",
         "tap_to_see_news" to "Click the button to see the news.",
-        "loading" to "Loading..."
+        "loading" to "Loading...",
+        "news_detail" to "News Detail",
+        "content" to "Content",
+        "source" to "Source",
+        "go_to_source" to "Go to News Source",
+        "content_not_found" to "Content not found",
+        "no_image" to "No Image",
+        "go_back" to "Go Back",
+        "article_not_in_memory" to "The article details could not be found in memory. Try going back and selecting the article again."
 
     ),
     "tr" to mapOf(
@@ -72,7 +80,15 @@ val strings = mapOf(
         "welcome_title" to "GulcinMobile'a Hoş Geldiniz",
         "welcome_description" to "En güncel gelişmeleri, yapay zekâdan siyasete, teknolojiden spora kadar her kategoride takip etmek için yukarıdaki menüden ilgini çeken başlığa tıklayarak göz atabilir, dünya gündeminden anında haberdar olabilirsiniz.",
         "tap_to_see_news" to "Haberleri görmek için butona tıklayın.",
-        "loading" to "Yükleniyor..."
+        "loading" to "Yükleniyor...",
+        "news_detail" to "Haber Detayı",
+        "content" to "İçerik",
+        "source" to "Kaynak",
+        "go_to_source" to "Haber Kaynağına Git",
+        "content_not_found" to "İçerik bulunamadı",
+        "no_image" to "Görsel Yok",
+        "go_back" to "Geri Dön",
+        "article_not_in_memory" to "Haber detayları hafızada bulunamadı. Geri dönüp haberi tekrar seçmeyi deneyin."
 
     ),
     "fr" to mapOf(
@@ -109,8 +125,16 @@ val strings = mapOf(
         "welcome_title" to "Bienvenue sur GulcinMobile",
         "welcome_description" to "Suivez les derniers développements dans chaque catégorie, de l'IA à la politique, de la technologie au sport, en cliquant sur le sujet qui vous intéresse dans le menu ci-dessus, et soyez instantanément informé de l'actualité mondiale.",
         "tap_to_see_news" to "Cliquez sur le bouton pour voir les actualités.",
-        "loading" to "Chargement..."
-    ),
+        "loading" to "Chargement...",
+        "news_detail" to "Détail de l'actualité",
+        "content" to "Contenu",
+        "source" to "Source",
+        "go_to_source" to "Aller à la source",
+        "content_not_found" to "Contenu non trouvé",
+        "no_image" to "Pas d'image",
+        "go_back" to "Retour",
+        "article_not_in_memory" to "Les détails de l'article n'ont pas pu être trouvés en mémoire. Essayez de revenir en arrière et de sélectionner à nouveau l'article."
+        ),
     "es" to mapOf(
         "home" to "Inicio",
         "show_news" to "Mostrar noticias de IA y tecnología 💡",
@@ -145,8 +169,17 @@ val strings = mapOf(
         "welcome_title" to "Bienvenido a GulcinMobile",
         "welcome_description" to "Siga los últimos desarrollos en cada categoría, desde IA hasta política, desde tecnología hasta deportes, haciendo clic en el tema que le interese en el menú de arriba, y esté instantáneamente informado sobre la agenda mundial.",
         "tap_to_see_news" to "Haga clic en el botón para ver las noticias.",
-        "loading" to "Cargando..."
-    ),
+        "loading" to "Cargando...",
+        "news_detail" to "Detalle de la noticia",
+        "content" to "Contenido",
+        "source" to "Fuente",
+        "go_to_source" to "Ir a la fuente",
+        "content_not_found" to "Contenido no encontrado",
+        "no_image" to "Sin imagen",
+        "go_back" to "Volver",
+        "article_not_in_memory" to "Los detalles del artículo no se pudieron encontrar en la memoria. Intente volver atrás y seleccionar el artículo nuevamente."
+
+        ),
     "de" to mapOf(
         "home" to "Startseite",
         "show_news" to "KI- und Technologie-Nachrichten anzeigen 💡",
@@ -181,8 +214,17 @@ val strings = mapOf(
         "welcome_title" to "Willkommen bei GulcinMobile",
         "welcome_description" to "Verfolgen Sie die neuesten Entwicklungen in jeder Kategorie, von KI bis Politik, von Technologie bis Sport, indem Sie im obigen Menü auf das Thema klicken, das Sie interessiert, und werden Sie sofort über die Weltlage informiert.",
         "tap_to_see_news" to "Klicken Sie auf die Schaltfläche, um die Nachrichten zu sehen.",
-        "loading" to "Wird geladen..."
-    ),
+        "loading" to "Wird geladen...",
+        "news_detail" to "Nachrichtendetail",
+        "content" to "Inhalt",
+        "source" to "Quelle",
+        "go_to_source" to "Zur Quelle gehen",
+        "content_not_found" to "Inhalt nicht gefunden",
+        "no_image" to "Kein Bild",
+        "go_back" to "Zurück",
+        "article_not_in_memory" to "Die Artikeldetails konnten im Speicher nicht gefunden werden. Versuchen Sie, zurückzugehen und den Artikel erneut auszuwählen."
+
+        ),
     "ja" to mapOf(
         "home" to "ホーム",
         "show_news" to "AIとテクノロジーのニュースを表示 💡",
@@ -217,8 +259,17 @@ val strings = mapOf(
         "welcome_title" to "GulcinMobileへようこそ",
         "welcome_description" to "上記のメニューから興味のあるトピックをクリックして、AIから政治、テクノロジーからスポーツまで、あらゆるカテゴリの最新情報をフォローし、世界の議題について即座に情報を得ることができます。",
         "tap_to_see_news" to "ニュースを見るにはボタンをクリックしてください。",
-        "loading" to "読み込み中..."
-    ),
+        "loading" to "読み込み中...",
+        "news_detail" to "ニュース詳細",
+        "content" to "コンテンツ",
+        "source" to "ソース",
+        "go_to_source" to "ニュースソースへ",
+        "content_not_found" to "コンテンツが見つかりません",
+        "no_image" to "画像なし",
+        "go_back" to "戻る",
+        "article_not_in_memory" to "記事の詳細がメモリに見つかりませんでした。戻って記事を再度選択してみてください。"
+
+        ),
     "ar" to mapOf(
         "home" to "الرئيسية",
         "show_news" to "عرض أخبار الذكاء الاصطناعي والتكنولوجيا 💡",
@@ -253,9 +304,18 @@ val strings = mapOf(
         "welcome_title" to "مرحبًا بك في GulcinMobile",
         "welcome_description" to "تابع أحدث التطورات في كل فئة من الذكاء الاصطناعي إلى السياسة، ومن التكنولوجيا إلى الرياضة من خلال النقر على الموضوع الذي يهمك من القائمة أعلاه، وكن على اطلاع فوري بجدول أعمال العالم.",
         "tap_to_see_news" to "انقر على الزر لرؤية الأخبار.",
-        "loading" to "جار التحميل..."
+        "loading" to "جار التحميل...",
+        "news_detail" to "تفاصيل الخبر",
+        "content" to "المحتوى",
+        "source" to "المصدر",
+        "go_to_source" to "الذهاب إلى المصدر",
+        "content_not_found" to "المحتوى غير موجود",
+        "no_image" to "لا توجد صورة",
+        "go_back" to "العودة",
+        "article_not_in_memory" to "تعذر العثور على تفاصيل المقالة في الذاكرة. حاول العودة واختيار المقالة مرة أخرى."
 
-    ),
+
+        ),
     "ru" to mapOf(
         "home" to "Главная",
         "show_news" to "Показать новости об ИИ и технологиях 💡",
@@ -290,9 +350,18 @@ val strings = mapOf(
         "welcome_title" to "Добро пожаловать в GulcinMobile",
         "welcome_description" to "Следите за последними событиями в каждой категории, от ИИ до политики, от технологий до спорта, нажав на интересующую вас тему в меню выше, и мгновенно получайте информацию о мировой повестке дня.",
         "tap_to_see_news" to "Нажмите на кнопку, чтобы увидеть новости.",
-        "loading" to "Загрузка..."
+        "loading" to "Загрузка...",
+        "news_detail" to "Детали новости",
+        "content" to "Содержание",
+        "source" to "Источник",
+        "go_to_source" to "Перейти к источнику",
+        "content_not_found" to "Содержание не найдено",
+        "no_image" to "Нет изображения",
+        "go_back" to "Назад",
+        "article_not_in_memory" to "Детали статьи не удалось найти в памяти. Попробуйте вернуться назад и выбрать статью снова."
 
-    ),
+
+        ),
     "zh" to mapOf(
         "home" to "首页",
         "show_news" to "显示人工智能与科技新闻 💡",
@@ -327,6 +396,14 @@ val strings = mapOf(
         "welcome_title" to "欢迎使用GulcinMobile",
         "welcome_description" to "通过点击上面菜单中您感兴趣的主题，关注从人工智能到政治、从技术到体育等各个类别的最新发展，并即时了解世界议程。",
         "tap_to_see_news" to "点击按钮查看新闻。",
-        "loading" to "加载中..."
+        "loading" to "加载中...",
+        "news_detail" to "新闻详情",
+        "content" to "内容",
+        "source" to "来源",
+        "go_to_source" to "前往新闻来源",
+        "content_not_found" to "未找到内容",
+        "no_image" to "无图片",
+        "go_back" to "返回",
+        "article_not_in_memory" to "在内存中找不到文章详情。请尝试返回并重新选择文章。"
     )
 )

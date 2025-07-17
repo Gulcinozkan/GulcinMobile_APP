@@ -39,6 +39,9 @@ class NewsViewModel(private val context: Context) : ViewModel() {
     // Orijinal İngilizce haberler
     private var originalArticles = listOf<GNewsArticle>()
 
+    // Son gösterilen haberler (çevrilmiş veya orijinal)
+    private var lastDisplayedArticles = listOf<GNewsArticle>()
+
     var selectedLanguageCode = "en" // Default to English
 
     // Aktif kategori
@@ -148,6 +151,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
 
                 // Eğer dil İngilizce ise doğrudan göster
                 if (selectedLanguageCode == "en") {
+                    lastDisplayedArticles = originalArticles
                     _uiState.value = NewsUiState(articles = originalArticles, isLoading = false)
                     Log.d("NewsViewModel", "Showing original English news")
                 } else {
@@ -307,6 +311,7 @@ class NewsViewModel(private val context: Context) : ViewModel() {
         }
     }
 
+
     // Dil tercihini güncelle ve mevcut haberleri çevir
     fun updateLanguage(languageCode: String) {
         viewModelScope.launch {
@@ -335,4 +340,78 @@ class NewsViewModel(private val context: Context) : ViewModel() {
             }
         }
     }
+
+    // URL'ye göre haber bulma fonksiyonu
+    fun findArticleByUrl(url: String): com.example.gulcinmobile.model.GNewsArticle? {
+        Log.d("NewsViewModel", "Searching for article with URL: $url")
+
+        // UI state'deki mevcut haberler arasında ara
+        val currentArticles = uiState.value.articles
+        if (currentArticles.isNotEmpty()) {
+            Log.d("NewsViewModel", "Searching in current UI state articles (${currentArticles.size})")
+
+            // Tam eşleşme kontrolü
+            val exactMatch = currentArticles.find { it.url == url }
+            if (exactMatch != null) {
+                Log.d("NewsViewModel", "Found exact URL match")
+                return exactMatch
+            }
+
+            // Kısmi eşleşme kontrolü
+            val partialMatch = currentArticles.find {
+                url.contains(it.url) || it.url.contains(url)
+            }
+            if (partialMatch != null) {
+                Log.d("NewsViewModel", "Found partial URL match")
+                return partialMatch
+            }
+        }
+
+        // Son gösterilen haberlerde ara
+        if (lastDisplayedArticles.isNotEmpty()) {
+            Log.d("NewsViewModel", "Searching in lastDisplayedArticles (${lastDisplayedArticles.size})")
+
+            // Tam eşleşme kontrolü
+            val exactMatch = lastDisplayedArticles.find { it.url == url }
+            if (exactMatch != null) {
+                Log.d("NewsViewModel", "Found exact URL match in lastDisplayedArticles")
+                return exactMatch
+            }
+
+            // Kısmi eşleşme kontrolü
+            val partialMatch = lastDisplayedArticles.find {
+                url.contains(it.url) || it.url.contains(url)
+            }
+            if (partialMatch != null) {
+                Log.d("NewsViewModel", "Found partial URL match in lastDisplayedArticles")
+                return partialMatch
+            }
+        }
+
+        // Orijinal haberlerde ara
+        if (originalArticles.isNotEmpty()) {
+            Log.d("NewsViewModel", "Searching in originalArticles (${originalArticles.size})")
+
+            // Tam eşleşme kontrolü
+            val exactMatch = originalArticles.find { it.url == url }
+            if (exactMatch != null) {
+                Log.d("NewsViewModel", "Found exact URL match in originalArticles")
+                return exactMatch
+            }
+
+            // Kısmi eşleşme kontrolü
+            val partialMatch = originalArticles.find {
+                url.contains(it.url) || it.url.contains(url)
+            }
+            if (partialMatch != null) {
+                Log.d("NewsViewModel", "Found partial URL match in originalArticles")
+                return partialMatch
+            }
+        }
+
+        Log.d("NewsViewModel", "No matching article found for URL: $url")
+        return null
+    }
+
+
 }
